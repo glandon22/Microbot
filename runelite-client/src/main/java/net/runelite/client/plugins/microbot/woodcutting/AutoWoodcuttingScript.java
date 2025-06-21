@@ -96,7 +96,7 @@ public class AutoWoodcuttingScript extends Script {
                 }
                 
                 if (!Rs2Inventory.hasItem("axe")) {
-                    if (!Rs2Equipment.hasEquippedContains("axe")) {
+                    if (!Rs2Equipment.isWearing("axe")) {
                         Microbot.showMessage("Unable to find axe in inventory/equipped");
                         shutdown();
                         return;

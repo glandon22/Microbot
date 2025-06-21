@@ -118,6 +118,7 @@ public class FletchingScript extends Script {
                 Rs2Bank.depositAll(model.getFletchingItem().getContainsInventoryName());
                 calculateItemToFletch();
                 secondaryItemToFletch = (model.getFletchingMaterial().getName() + " logs").trim();
+                Rs2Inventory.waitForInventoryChanges(5000);
                 break;
             case PROGRESSIVE_STRUNG:
                 Rs2Bank.depositAll();

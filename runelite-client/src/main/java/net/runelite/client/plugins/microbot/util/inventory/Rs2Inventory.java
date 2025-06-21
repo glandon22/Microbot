@@ -745,11 +745,10 @@ public class Rs2Inventory {
      * @return The last item that matches the ID, or null if not found.
      */
     public static Rs2ItemModel getLast(int id) {
-
-        long count = items().size();
-        Stream<Rs2ItemModel> stream = items().stream();
-
-        return stream.skip(count - 1).findFirst().orElse(null);
+        return items().stream()
+                .filter(item -> item.getId() == id)
+                .reduce((first, second) -> second)
+                .orElse(null);
     }
 
     /**

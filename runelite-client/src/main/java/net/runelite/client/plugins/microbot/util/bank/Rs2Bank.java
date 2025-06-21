@@ -1173,7 +1173,7 @@ public class Rs2Bank {
     }
 
     /**
-     * Find closest available bank
+     * Find the closest available bank
      * finds closest npc then bank booth then chest
      * @return True if bank was successfully opened, otherwise false.
      */
