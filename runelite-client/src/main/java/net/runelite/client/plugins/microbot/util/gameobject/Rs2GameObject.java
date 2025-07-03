@@ -471,6 +471,8 @@ public class Rs2GameObject {
 
     public static <T extends TileObject> List<TileObject> getAll(Predicate<? super T> predicate, WorldPoint anchor, int distance) {
         List<TileObject> all = new ArrayList<>();
+        // rs2walker.handletransports occasionally passes null
+        if (anchor == null) return  all;
         all.addAll(fetchGameObjects(predicate, anchor, distance));
 		all.addAll(fetchTileObjects(predicate, anchor, distance));
         return all;
@@ -1700,8 +1702,10 @@ public class Rs2GameObject {
             } else if (index == 4) {
                 menuAction = MenuAction.GAME_OBJECT_FIFTH_OPTION;
             }
-
+            int curentYaw = -99999;
             if (!Rs2Camera.isTileOnScreen(object.getLocalLocation())) {
+                curentYaw = Microbot.getClient().getCameraYaw();
+                System.out.println("changine yaw: " + curentYaw);
                 Rs2Camera.turnTo(object);
             }
 
@@ -1716,6 +1720,9 @@ public class Rs2GameObject {
             Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), object.getId(), -1, action, objComp.getName(), object), Rs2UiHelper.getObjectClickbox(object));
 // MenuEntryImpl(getOption=Use, getTarget=Barrier, getIdentifier=43700, getType=GAME_OBJECT_THIRD_OPTION, getParam0=53, getParam1=51, getItemId=-1, isForceLeftClick=true, getWorldViewId=-1, isDeprioritized=false)
             //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), object.getId(),-1, "", "", -1, -1);
+            if (curentYaw != -99999) {
+                Microbot.getClient().setCameraYawTarget(curentYaw);
+            }
 
         } catch (Exception ex) {
             Microbot.log("Failed to interact with object " + ex.getMessage());

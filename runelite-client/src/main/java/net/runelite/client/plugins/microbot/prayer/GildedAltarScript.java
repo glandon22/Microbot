@@ -5,13 +5,16 @@ import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotOverlay;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.ArrayList;
@@ -72,13 +75,15 @@ public class GildedAltarScript extends Script {
                 if (!super.run()) {
                     return;
                 }
-                if (!Rs2Inventory.hasItem(995)) {
-                    Microbot.showMessage("No gp found in your inventory");
+                if (!Rs2Inventory.hasItem(995) && !inHouse()) {
+                    //Microbot.showMessage("No gp found in your inventory");
+                    System.out.println("No gp found in your inventory");
                     shutdown();
                     return;
                 }
-                if (!hasNotedBones() && !hasUnNotedBones()) {
-                    Microbot.showMessage("No bones found in your inventory");
+                if (!hasNotedBones() && !hasUnNotedBones() && !inHouse()) {
+                    //Microbot.showMessage("No bones found in your inventory");
+                    System.out.println("No bones found in your inventory");
                     shutdown();
                     return;
                 }
@@ -112,7 +117,7 @@ public class GildedAltarScript extends Script {
         System.out.println("Attempting to leave house...");
 
         // We should only rely on using the settings menu if the portal is several rooms away from the portal. Bringing up 3 different interfaces when we can see the portal on screen is unnecessary.
-        if(usePortal) {
+        if(usePortal != null) {
             TileObject portalObject = Rs2GameObject.findObjectById(HOUSE_PORTAL_OBJECT);
             if (portalObject == null) {
                 System.out.println("Not in house, HOUSE_PORTAL_OBJECT not found.");
@@ -153,17 +158,12 @@ public class GildedAltarScript extends Script {
     }
 
     public void unnoteBones() {
-        if (Microbot.getClient().getWidget(14352385) == null) {
-            if (!Rs2Inventory.isItemSelected()) {
-                Rs2Inventory.use("bones");
-            } else {
-                Rs2Npc.interact("Phials", "Use");
-                Rs2Player.waitForWalking();
-            }
-        } else if (Microbot.getClient().getWidget(14352385) != null) {
-            Rs2Keyboard.keyPress('3');
-            Rs2Inventory.waitForInventoryChanges(2000);
-        }
+        Rs2Inventory.use("bones");
+        sleepUntil(Rs2Inventory::isItemSelected);
+        Rs2Npc.interact("phials", "Use");
+        sleepUntil(() -> Rs2Widget.hasWidget("Exchange All:"));
+        Rs2Widget.clickWidget("Exchange All:");
+        Rs2Inventory.waitForInventoryChanges(2000);
     }
 
     private void enterHouse() {
@@ -265,5 +265,22 @@ public class GildedAltarScript extends Script {
 
     public void addNameToBlackList() {
         blacklistNames.add(houseOwner);
+    }
+
+    @Override
+    public void shutdown() {
+        if (mainScheduledFuture != null && !mainScheduledFuture.isDone()) {
+            mainScheduledFuture.cancel(true);
+            if (Microbot.getClientThread().scheduledFuture != null)
+                Microbot.getClientThread().scheduledFuture.cancel(true);
+            initialPlayerLocation = null;
+            Microbot.pauseAllScripts = false;
+            Rs2Walker.disableTeleports = false;
+            Microbot.getSpecialAttackConfigs().reset();
+        }
+        if (scheduledFuture != null && !scheduledFuture.isDone()) {
+            scheduledFuture.cancel(true);
+        }
+        startTime = null;
     }
 }

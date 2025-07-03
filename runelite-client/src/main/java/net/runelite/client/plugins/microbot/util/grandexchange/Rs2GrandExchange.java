@@ -33,6 +33,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -182,7 +183,7 @@ public class Rs2GrandExchange {
 
     private static void confirm() {
         Microbot.getMouse().click(getConfirm().getBounds());
-        sleepUntil(() -> Rs2Widget.hasWidget("Your offer is much higher"), 2000);
+        sleepUntil(() -> Rs2Widget.hasWidget("Your offer is much higher") || Rs2Widget.hasWidget("Select an offer slot"), 2000);
         if (Rs2Widget.hasWidget("Your offer is much higher")) {
             Rs2Widget.clickWidget("Yes");
         }
@@ -267,20 +268,20 @@ public class Rs2GrandExchange {
                 int basePrice = Microbot.getVarbitValue(VarbitID.GE_NEWOFFER_TYPE);
                 int currentPercent = NumberExtractor.extractNumber(pricePerItemButtonXPercent.getText());
 
-                // Update Price per item custom percentage if it doesn't match
-                if (currentPercent != percent) {
+                // Update Price per item custom percentage if it doesn't match, percent increase cant be set above 99
+                if (currentPercent != Math.min(percent, 99)) {
                     // If current percentage is empty (indicated by +X%)
                     if (currentPercent == -1) {
                         Microbot.getMouse().click(pricePerItemButtonXPercent.getBounds());
                     } else {
                         Microbot.doInvoke(new NewMenuEntry("Customise", 15, pricePerItemButtonXPercent.getId(), MenuAction.CC_OP.getId(), 2, -1, ""), new Rectangle(pricePerItemButtonXPercent.getBounds()));
                     }
-                    sleep(300, 1200);
+                    //sleep(300, 1200);
                     sleepUntil(() -> Rs2Widget.hasWidget("Set a percentage to decrease/increase"), 2000);
                     Rs2Keyboard.typeString(Integer.toString(percent));
                     Rs2Keyboard.enter();
-                    sleepUntil(() -> currentPercent == NumberExtractor.extractNumber(pricePerItemButtonXPercent.getText()), 2000);
-                    sleep(300, 1200);
+                    sleepUntil(() -> Math.min(percent, 99) == NumberExtractor.extractNumber(pricePerItemButtonXPercent.getText()), 2000);
+                    //sleep(300, 1200);
                 }
 
                 Microbot.getMouse().click(pricePerItemButtonXPercent.getBounds());

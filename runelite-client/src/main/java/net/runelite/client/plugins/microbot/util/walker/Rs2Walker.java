@@ -15,6 +15,7 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotOverlay;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -274,7 +275,7 @@ public class Rs2Walker {
             for (int i = indexOfStartPoint; i < path.size(); i++) {
                 WorldPoint currentWorldPoint = path.get(i);
 
-                System.out.println("start loop " + i);
+                //System.out.println("start loop " + i);
 
 				// add breakpoint here
 
@@ -1142,6 +1143,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
         for (Transport transport : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new HashSet<>())) {
             Collection<WorldPoint> worldPointCollections;
             //in some cases the getOrigin is null, for teleports that start the player location
+            // this cant be null
             if (transport.getOrigin() == null) {
                 worldPointCollections = Collections.singleton(null);
             } else {
@@ -1270,6 +1272,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
 
                     if (transport.getType() == TransportType.TELEPORTATION_ITEM) {
                         if (handleTeleportItem(transport)) {
+                            System.out.println("we are here");
                             sleepUntil(() -> !Rs2Player.isAnimating());
                             sleepUntilTrue(() -> Rs2Player.getWorldLocation().distanceTo(transport.getDestination()) < OFFSET);
                             break;
@@ -1284,8 +1287,8 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
                             break;
                         }
                     }
-                    
 
+                    System.out.println("my broken wp: " + transport.getType());
 					List<TileObject> objects = Rs2GameObject.getAll(o -> o.getId() == transport.getObjectId(), transport.getOrigin(), 10).stream()
 						.sorted(Comparator.comparingInt(o -> o.getWorldLocation().distanceTo(transport.getOrigin())))
 						.collect(Collectors.toList());
@@ -1297,6 +1300,9 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
 							.min(Comparator.comparing(o -> ((TileObject) o).getWorldLocation().distanceTo(transport.getOrigin()))
 								.thenComparing(o -> ((TileObject) o).getWorldLocation().distanceTo(transport.getDestination()))).orElse(null);
 					}
+
+                    System.out.println("hello: " + transport.getObjectId());
+                    System.out.println("goodbye: " + object);
 					if (object != null && object.getId() == transport.getObjectId()) {
 						System.out.println("Object Type: " + Rs2GameObject.getObjectType(object));
 
@@ -1495,6 +1501,7 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
     }
 
     private static boolean handleTeleportItem(Transport transport) {
+        System.out.println("we are here11");
         if (Rs2Pvp.isInWilderness() && (Rs2Pvp.getWildernessLevelFrom(Rs2Player.getWorldLocation()) > (transport.getMaxWildernessLevel() + 1))) return false;
         boolean succesfullAction = false;
         for (Set<Integer> itemIds : transport.getItemIdRequirements()) {

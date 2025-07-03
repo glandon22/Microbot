@@ -1,4 +1,4 @@
-package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.sheepshearer;
+package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.impcatcher;
 
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
@@ -8,33 +8,31 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.ArrayList;
 
-public class SheepShearer {
-    private void travelToQuestStart() {
-        System.out.println("Headed to quest start - Sheep Shearer.");
-        Rs2Walker.walkTo(new WorldPoint(3189, 3272, 0), 2);
+public class ImpCatcher {
+    DialogueHandler dialogueHandler;
+    private void goToWizardsTower() {
+        Rs2Walker.walkTo(3105, 3163, 2);
     }
 
     private void doDialogue() {
         ArrayList<String> dialogue = new ArrayList<>();
-        dialogue.add( "I'm looking for a quest.");
-        dialogue.add( "Yes, okay. I can do that.");
+        dialogue.add("Give me a quest please.");
         dialogue.add("Yes.");
-        dialogue.add("Climb down the stairs.");
-        dialogue.add("I need to talk to you about shearing these sheep!");
-        Rs2Npc.interact("Fred the Farmer", "Talk-to");
+        Rs2Npc.interact("Wizard Mizgog", "Talk-to");
+        DialogueHandler.handleConversation(dialogue, 15);
+        Rs2Npc.interact("Wizard Mizgog", "Talk-to");
         DialogueHandler.handleConversation(dialogue, 15);
         Rs2Keyboard.keyPress(27);
     }
 
     private boolean travelToGE() {
-        // getting killed by dark wizards entering varrock from the south, need to path thru barb village probably
         System.out.println("Returning to GE.");
         Rs2Walker.walkTo(new WorldPoint(3164, 3484, 0), 3);
         return true;
     }
 
-    public void completeQuest() {
-        travelToQuestStart();
+    public void doQuest() {
+        goToWizardsTower();
         doDialogue();
         travelToGE();
     }
