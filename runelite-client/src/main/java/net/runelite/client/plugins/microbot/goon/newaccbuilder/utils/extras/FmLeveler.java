@@ -146,9 +146,11 @@ public class FmLeveler {
 
             case BANKING:
                 debug("Banking");
+                //when i level up and begin doing a new log, sometimes the old logs are still in inv. dump them
+                boolean dumpInv = Rs2Inventory.hasItem("log");
                 BankHandler.withdrawQuestItems(List.of(
                         new BankHandler.QuestItem(logType.itemName, 27, false, false ,false)
-                ), false,false);
+                ), dumpInv,false);
                 sleepUntil(() -> Rs2Inventory.hasItem(logType.itemId), 2000);
                 break;
 
