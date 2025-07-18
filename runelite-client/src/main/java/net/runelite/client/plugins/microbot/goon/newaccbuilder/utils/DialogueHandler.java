@@ -13,6 +13,7 @@ import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class DialogueHandler {
     public static boolean handleConversation(List<String> questions, int timeout) {
+        // might add support to not timeout during cutscenes? should test this
         // dont modify the original
         List<String> questionsCopy = new ArrayList<>(questions);
         long lastDialogue = System.currentTimeMillis();

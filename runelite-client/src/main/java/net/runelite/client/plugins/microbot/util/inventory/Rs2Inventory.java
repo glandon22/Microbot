@@ -2190,8 +2190,10 @@ public class Rs2Inventory {
                 || Rs2Widget.getWidget(ComponentID.DEPOSIT_BOX_INVENTORY_ITEM_CONTAINER).isHidden()).orElse(false);
 
         Widget widget;
-
-        if (Rs2Bank.isOpen()) {
+        boolean bankIsOpen = Rs2Bank.isOpen();
+        System.out.println("inv bank open: " + bankIsOpen);
+        if (bankIsOpen) {
+            System.out.println("the bank interface is open");
             param1 = ComponentID.BANK_INVENTORY_ITEM_CONTAINER;
             widget = Rs2Widget.getWidget(param1);
         } else if (isDepositBoxOpen) {
@@ -2633,5 +2635,41 @@ public class Rs2Inventory {
         }
         Microbot.getNaturalMouse().moveTo(point.getX(), point.getY());
         return true;
+    }
+
+    /**
+     * Waits for the inventory to contain an item while running a specified action repeatedly to acquire that item.
+     * Detects changes in inventory size, stackable size, or item quantities.
+     *
+     * @param actionWhileWaiting The action to execute while waiting for the inventory to change.
+     * @param item Name of the item to check for.
+     * @param actionDelay How long to wait in between running the action and checking inv status(ms).
+     * @param waitTimeout max time to wait on the item (ms).
+     * @return True if the inventory changes while waiting, false otherwise.
+     */
+    public static boolean waitForItemInInventory(Runnable actionWhileWaiting, String item, int actionDelay, int waitTimeout) {
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < waitTimeout) {
+            actionWhileWaiting.run();
+            long postActionWaitPeriod = System.currentTimeMillis();
+            while (System.currentTimeMillis() - postActionWaitPeriod < actionDelay) {
+                if (Rs2Inventory.hasItem(item)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean waitForItemInInventory(Runnable actionWhileWaiting, int item, int actionDelay, int waitTimeout) {
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < waitTimeout) {
+            actionWhileWaiting.run();
+            long postActionWaitPeriod = System.currentTimeMillis();
+            while (System.currentTimeMillis() - postActionWaitPeriod < actionDelay) {
+                if (Rs2Inventory.hasItem(item)) return true;
+            }
+        }
+
+        return false;
     }
 }

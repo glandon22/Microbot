@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.romeoandjuliet;
 
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -41,7 +42,7 @@ public class RomeoAndJuliet {
         Rs2Walker.walkTo(3212, 3423, 0, 2);
         // long cutscene
         talkToNPC("romeo", dialogue, 30);
-        boolean complete = sleepUntil(() -> Rs2Widget.hasWidget("Romeo and Juliet"), 90000);
-        System.out.println("Finished romeo and juliet. status: " + complete);
+        MiscellaneousUtilities.waitForQuestFinish();
+        System.out.println("Finished romeo and juliet.");
     }
 }

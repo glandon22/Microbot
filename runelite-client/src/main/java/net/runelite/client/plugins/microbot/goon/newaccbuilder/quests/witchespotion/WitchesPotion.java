@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witchespotion;
 
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -24,20 +25,6 @@ public class WitchesPotion {
     ArrayList<String> dialogue2 = new ArrayList<>(List.of(
             "Yes, help me become one with my darker side."
     ));
-    private void withdrawQuestItems() {
-        Rs2Bank.openBank();
-        Rs2Bank.depositAll();
-        Rs2Bank.depositEquipment();
-        Rs2Bank.setWithdrawAsNote();
-        Rs2Bank.withdrawAll("dragon bones");
-        Rs2Bank.setWithdrawAsItem();
-        Rs2Bank.withdrawAndEquip("iron scimitar");
-        Rs2Bank.withdrawOne("eye of newt");
-        Rs2Bank.withdrawOne("raw beef");
-        Rs2Bank.withdrawOne("onion");
-        Rs2Bank.withdrawX("coins", 100000);
-        Rs2Bank.closeBank();
-    }
 
     private void doDialogue(List<String> dialogueOptions) {
         Rs2Npc.interact("Hetty", "Talk-to");
@@ -47,9 +34,13 @@ public class WitchesPotion {
     public boolean completeQuest() {
         //Walk to the bank in draynor village
         Rs2Walker.walkTo(3093, 3242, 0);
-        withdrawQuestItems();
+        BankHandler.withdrawQuestItems(List.of(
+                new BankHandler.QuestItem("iron scimitar", 1, false, false, true),
+                new BankHandler.QuestItem("eye of newt", 1, false, false, false),
+                new BankHandler.QuestItem("raw beef", 1, false, false, false),
+                new BankHandler.QuestItem("onion", 1, false, false, false)
+        ), true, true);
         //make sure the inventory tab is open
-        Rs2Keyboard.keyPress(27);
         Rs2Walker.walkTo(2968, 3210, 0, 3);
         Rs2GameObject.interact("range", "cook");
         sleepUntil(() -> Rs2Widget.hasWidget("like to cook"));

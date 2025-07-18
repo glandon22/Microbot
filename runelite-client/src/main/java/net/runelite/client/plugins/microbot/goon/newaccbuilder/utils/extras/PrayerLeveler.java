@@ -215,7 +215,12 @@ public class PrayerLeveler {
         }
     }
     public void levelTo43() {
-        while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) > 43) {
+        while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) < 43) {
+            System.out.println("Loop iteration, Prayer Level: " + Microbot.getClient().getRealSkillLevel(Skill.PRAYER));
+            System.out.println("Coins: " + Rs2Inventory.hasItem(995) + ", In House: " + inHouse());
+            System.out.println("Noted Bones: " + hasNotedBones() + ", Unnoted Bones: " + hasUnNotedBones());
+            System.out.println("Is Gaining XP: " + Microbot.isGainingExp);
+
             if (!Rs2Inventory.hasItem(995) && !inHouse()) {
                 System.out.println("No gp found in your inventory");
                 return;
@@ -225,24 +230,35 @@ public class PrayerLeveler {
                 return;
             }
 
-            if (Microbot.isGainingExp) return;
+            if (Microbot.isGainingExp) {
+                sleep(100); // Small delay to avoid spamming during animations
+                continue; // Use continue instead of return to keep the loop running
+            }
 
             calculateState();
+            System.out.println("Current State: " + state);
 
-            switch (state) {
-                case LEAVE_HOUSE:
-                    leaveHouse();
-                    break;
-                case UNNOTE_BONES:
-                    unnoteBones();
-                    break;
-                case ENTER_HOUSE:
-                    enterHouse();
-                    break;
-                case BONES_ON_ALTAR:
-                    bonesOnAltar();
-                    break;
+            try {
+                switch (state) {
+                    case LEAVE_HOUSE:
+                        leaveHouse();
+                        break;
+                    case UNNOTE_BONES:
+                        unnoteBones();
+                        break;
+                    case ENTER_HOUSE:
+                        enterHouse();
+                        break;
+                    case BONES_ON_ALTAR:
+                        bonesOnAltar();
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println("Error in state " + state + ": " + e.getMessage());
             }
+
+            sleep(50); // Small delay to prevent excessive CPU usage
         }
+        System.out.println("Reached Prayer level 43!");
     }
 }

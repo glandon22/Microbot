@@ -152,6 +152,24 @@ public class Rs2Widget {
 
             // Use findWidget to perform the search on all child types
             Widget foundWidget = findWidget(text, List.of(rootWidget), exact);
+            if (foundWidget != null) {
+                System.out.println("We found something");
+                System.out.println(foundWidget.getText());
+                System.out.println(foundWidget.isHidden());
+                System.out.println(foundWidget.isSelfHidden());
+            }
+            return foundWidget != null;
+        }).orElse(false);
+    }
+
+    public static boolean hasWidgetText(String text, int widgetId, int childId, boolean exact, boolean visibleOnly) {
+        return Microbot.getClientThread().runOnClientThreadOptional(() -> {
+            Widget rootWidget = getWidget(widgetId, childId);
+            if (rootWidget == null) return false;
+
+            // Use findWidget to perform the search on all child types
+            Widget foundWidget = findWidget(text, List.of(rootWidget), exact);
+            if (visibleOnly) return foundWidget != null && !foundWidget.isHidden();
             return foundWidget != null;
         }).orElse(false);
     }

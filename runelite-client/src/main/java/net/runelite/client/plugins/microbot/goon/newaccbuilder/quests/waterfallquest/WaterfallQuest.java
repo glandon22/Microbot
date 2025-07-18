@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.waterfallquest;
 
+import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
@@ -16,6 +18,7 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.pestcontrol.Game;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -143,7 +146,10 @@ public class WaterfallQuest {
         sleepUntil(Rs2Player::hasPrayerPoints);
         Rs2Walker.walkTo(2566,9900,0, 3);
         Rs2GameObject.interact(2002, "open");
-        sleep(1000);
+        sleepUntil(() -> Microbot.getClient().getTopLevelWorldView().getScene().isInstance());
+        System.out.println("waiting for chamber instance to load");
+        sleep(5000);
+        //Rs2Walker.walkTo(2604,9909,0, 3);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
     }
 
@@ -163,6 +169,29 @@ public class WaterfallQuest {
             for (String rune : runes) {
                 Rs2Inventory.use(rune);
                 Rs2GameObject.interact(point, "use");
+                Rs2Inventory.waitForInventoryChanges(5000);
+            }
+        }
+    }
+
+    private void placeRunesV2() {
+        List<GameObject> allObjects = Rs2GameObject.getGameObjects();
+        List<GameObject> filtered = new ArrayList<>();
+        for (GameObject object : allObjects) {
+            if (object == null) continue;
+            if (object.getId() == 2005) {
+                if (object.getWorldLocation().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) < 15) {
+                    filtered.add(object);
+                }
+            }
+        }
+
+        String[] runes = {"air rune", "earth rune", "water rune"};
+
+        for (GameObject object : filtered) {
+            for (String rune : runes) {
+                Rs2Inventory.use(rune);
+                Rs2GameObject.interact(object, "use");
                 Rs2Inventory.waitForInventoryChanges(5000);
             }
         }
@@ -190,9 +219,9 @@ public class WaterfallQuest {
         pebble();
         amulet();
         enterChamber();
-        placeRunes();
+        placeRunesV2();
         placeItems();
-        DialogueHandler.handleConversation(List.of(), 5000);
+        DialogueHandler.handleConversation(List.of(), 5);
         MiscellaneousUtilities.waitForQuestFinish("Waterfall Quest");
     }
 }

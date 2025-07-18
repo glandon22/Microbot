@@ -5,6 +5,8 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 
 import java.util.List;
 
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+
 public class BankHandler {
     @Value
     public static class QuestItem {
@@ -31,5 +33,6 @@ public class BankHandler {
         }
 
         Rs2Bank.closeBank();
+        System.out.println("RS2bank: " + Rs2Bank.isOpen());
     }
 }

@@ -10,18 +10,26 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.cooksassistant.CooksAssistant;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.doricsquest.DoricsQuest;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.druidicritual.DruidicRitual;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.fightarena.FightArena;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.goblindiplomacy.GoblinDiplomacy;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.grandtree.GrandTree;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.impcatcher.ImpCatcher;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.knightssword.KnightsSword;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.monksfriend.MonksFriend;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.naturalhistoryquiz.NaturalHistoryQuiz;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.plaguecity.PlagueCity;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.romeoandjuliet.RomeoAndJuliet;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.runemysteries.RuneMysteries;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.seaslug.SeaSlug;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.sheepshearer.SheepShearer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.treegnomevillage.TreeGnomeVillage;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.vampireslayer.VampireSlayer;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.waterfallquest.WaterfallQuest;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witcheshouse.WitchesHouse;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witchespotion.WitchesPotion;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLeveler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
 import net.runelite.client.plugins.microbot.prayer.GildedAltarConfig;
@@ -31,6 +39,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -39,6 +48,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class NewAccBuilderScript extends Script {
+    FmLeveler fmLeveler = new FmLeveler();
     String scriptMainTask = "Starting Script";
     String scriptSubTask = "Determining task";
     PrayerLeveler prayerLeveler = new PrayerLeveler();
@@ -57,6 +67,13 @@ public class NewAccBuilderScript extends Script {
     RuneMysteries runeMysteries = new RuneMysteries();
     NaturalHistoryQuiz naturalHistoryQuiz = new NaturalHistoryQuiz();
     WaterfallQuest waterfallQuest = new WaterfallQuest();
+    GrandTree grandTree = new GrandTree();
+    TreeGnomeVillage treeGnomeVillage = new TreeGnomeVillage();
+    MonksFriend monksFriend = new MonksFriend();
+    PlagueCity plagueCity = new PlagueCity();
+    SeaSlug seaSlug = new SeaSlug();
+    KnightsSword knightsSword = new KnightsSword();
+    FightArena fightArena = new FightArena();
 
     public boolean run(NewAccBuilderConfig config) {
         ArrayList<BankHandler.QuestItem> vampAndRomeoJulietItems = new ArrayList<>();
@@ -135,14 +152,35 @@ public class NewAccBuilderScript extends Script {
                         new BankHandler.QuestItem("prayer potion", 3, false, false, false),
                         new BankHandler.QuestItem("monk's robe top", 1, false, false, true),
                         new BankHandler.QuestItem("monk's robe", 1, false, false, true)
-
                 )
         );
+        ArrayList<BankHandler.QuestItem> grandTreeItems = new ArrayList<>(
+                List.of(
+                        new BankHandler.QuestItem("games necklace", 1, false, false, false),
+                        new BankHandler.QuestItem("necklace of passage", 1, false, false, false),
+                        new BankHandler.QuestItem("prayer potion(4)", 3, false, false, false),
+                        new BankHandler.QuestItem("varrock teleport", 3, false, false, false),
+                        new BankHandler.QuestItem("rope", 3, false, false, false),
+                        new BankHandler.QuestItem("mind rune", 1000, false, false, false),
+                        new BankHandler.QuestItem("fire rune", 1000, false, false, false),
+                        new BankHandler.QuestItem("staff of air", 1, false, false, true),
+                        new BankHandler.QuestItem("ring of dueling", 1, false, false, true)
+                )
+        );
+
         ArrayList<ItemBuyer.ItemToBuy> necessaryAccountItems = new ArrayList<>();
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("egg", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pot of flour", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of milk", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("red bead", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ball of wool", 20, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("yellow bead", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("white bead", 1, 5000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("black bead", 1, 5000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("staff of air", 1, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("amulet of glory(6)", 1, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("necklace of passage(5)", 3, -1));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dragon bones", 215, -1));
+        //necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dragon bones", 215, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron scimitar", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("eye of newt", 1000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("onion", 1, 1000));
@@ -181,8 +219,10 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("chocolate dust", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("snape grass", 1, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of milk", 1, 1000));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of water", 1, 1000));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("logs", 7, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of water", 10, 1000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("logs", 75, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("oak logs", 200, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("willow logs", 1000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("jug of water", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("swamp paste", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("unlit torch", 1, 1000));
@@ -192,12 +232,13 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ardougne teleport", 10, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("arrow shaft", 7000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("feather", 7000, -1));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("guam potion(unf)", 887, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("guam potion (unf)", 887, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("molten glass", 1000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron dart", 2000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw sardine", 600, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("steel nails", 2000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("saw", 1, 1000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("tinderbox", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("plank", 1, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pure essence", 1000, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("air tiara", 1, -1));
@@ -206,35 +247,39 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("prayer potion(4)", 10, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe top", 1, 3000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000));
+        // add some random junk on the end in case i fail to withdraw everything from ge bc of delays etc
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000));
 
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                //cooksAssistant.completeQuest();
-                //sheepShearer.completeQuest();
-                //impCatcher.doQuest();
-                //Rs2Walker.walkTo(3093, 3243, 0);
-                //itemBuyer.buyItems(necessaryAccountItems);
-                //itemBuyer.ensureAllOffersCollected(true);
-                //witchesPotion.completeQuest();
-                //prayerLeveler.hopWorlds(330);
-                /*Plugin plugin = Microbot.getPluginManager().getPlugins().stream()
-                        .filter(p -> Objects.equals(p.getName(), PluginDescriptor.Mocrosoft + "Gilded Altar"))
-                        .findFirst()
-                        .orElse(null);
-                Microbot.getClientThread().runOnSeperateThread(() -> {
-                    Microbot.startPlugin(plugin);
-                    return false;
-                });
-                while (Microbot.getClient().getRealSkillLevel(Skill.PRAYER) != 43) {
-                    System.out.println(Microbot.getClient().getRealSkillLevel(Skill.PRAYER));
-                    sleep(1000, 1100);
+                //should change this to buy everything first then go down and do quests
+                /*cooksAssistant.completeQuest();
+                sheepShearer.completeQuest();
+                Rs2Walker.walkTo(3293, 3379, 0);
+                Rs2Walker.walkTo(3278, 3428, 0);
+                Rs2Walker.walkTo(3164, 3483, 0);
+                itemBuyer.buyItems(necessaryAccountItems);
+                itemBuyer.ensureAllOffersCollected(true);
+                impCatcher.completeQuest();
+                witchesPotion.completeQuest();
+                Rs2Walker.walkTo(3093, 3243, 0, 2);
+                BankHandler.withdrawQuestItems(List.of(
+                        new BankHandler.QuestItem("dragon bones", 1, true, true, false),
+                        new BankHandler.QuestItem("coins", 100000, false, false, false)
+                ), true, true);
+                Rs2Walker.walkTo(2954, 3219, 0);
+                while (Rs2Player.getWorld() != 330) {
+                    MiscellaneousUtilities.hopWorlds(330);
                 }
-                Microbot.getClientThread().runOnSeperateThread(() -> {
-                    Microbot.stopPlugin(plugin);
-                    return false;
-                });
                 prayerLeveler.levelTo43();
+                System.out.println("done with prayer training");
+                while (Rs2Player.getWorld() == 330) {
+                    System.out.println("hopping out of 330");
+                    MiscellaneousUtilities.hopWorlds(-1);
+                }
                 sleepUntil(() -> !Microbot.getClient().getTopLevelWorldView().getScene().isInstance());
                 Rs2Walker.walkTo(3093, 3242, 0, 3);
                 bankHandler.withdrawQuestItems(vampAndRomeoJulietItems, true, true);
@@ -245,25 +290,42 @@ public class NewAccBuilderScript extends Script {
                 Rs2Walker.walkTo(3183, 3437, 0);
                 bankHandler.withdrawQuestItems(doricsAndGoblinDiploItems, true, true);
                 doricsQuest.completeQuest();
-                //low confidence in this script currently working. need to monitor dialogue closely
                 goblinDiplomacy.completeQuest();
                 Rs2Walker.walkTo(2945, 3370, 0, 2);
-                bankHandler.withdrawQuestItems(witchesHouseAndDruidicItems, true, true);
+                BankHandler.withdrawQuestItems(witchesHouseAndDruidicItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
                 witchesHouse.completeQuest();
                 druidicRitual.completeQuest();
                 Rs2Walker.walkTo(2944, 3370, 0, 2);
-                bankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);
+                BankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);
                 runeMysteries.completeQuest();
-                naturalHistoryQuiz.completeQuest();*/
+                naturalHistoryQuiz.completeQuest();
                 Rs2Walker.walkTo(3168, 3489, 0, 2);
                 BankHandler.withdrawQuestItems(waterfallPt1, true, true);
                 waterfallQuest.completeQuest();
+                Rs2Walker.walkTo(2533, 3571, 0, 3);
+                BankHandler.withdrawQuestItems(grandTreeItems, true, true);
+                MiscellaneousUtilities.setSpell("fire strike");
+                Rs2Walker.walkTo(2461, 3379, 0, 3);
+                MiscellaneousUtilities.helpFemi();
+                Rs2Walker.walkTo(2474, 3438, 0, 3);
+                MiscellaneousUtilities.gnomeAgil();
+                Rs2Walker.walkTo(2465, 3489, 0, 3);
+                grandTree.completeQuest();
+                treeGnomeVillage.completeQuest();
+                monksFriend.completeQuest();
+                plagueCity.completeQuest();*/
+                Rs2Walker.walkTo(3161, 3489, 0);
+                fmLeveler.levelUp();
+                seaSlug.completeQuest();
+                knightsSword.completeQuest();
+                fightArena.completeQuest();
                 System.out.println("shutting down");
                 shutdown();
             } catch (Exception ex) {
                 shutdown();
                 System.out.println("this broke");
+                System.out.println(ex.getMessage());
                 throw(ex);
 
             }

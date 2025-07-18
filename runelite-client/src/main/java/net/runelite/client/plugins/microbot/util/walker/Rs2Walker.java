@@ -1605,7 +1605,10 @@ public static List<WorldPoint> getWalkPath(WorldPoint target) {
             }
         }
         else {
-            return interactWithNewRuneliteMenu(transport,itemId);
+            System.out.println("itemacio: " + itemAction);
+            boolean res = interactWithNewRuneliteMenu(transport,itemId);
+            System.out.println("dsffdsdsf: " + res);
+            return res;
 
         }
 
