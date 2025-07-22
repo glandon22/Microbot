@@ -40,7 +40,7 @@ public class RFDStart {
                 new BankHandler.QuestItem("ashes", 1, false, false, false),
                 new BankHandler.QuestItem("fruit blast", 1, false, false, false),
                 new BankHandler.QuestItem("greenman's ale", 1, false, false, false),
-                new BankHandler.QuestItem("eye of newt", 1, false, false, false),
+                new BankHandler.QuestItem("eye of newt", 1, false, false, false)
         ), false, false);
         Rs2Walker.walkTo(3229, 3410, 0);
         Rs2GameObject.interact("crate", "buy");
