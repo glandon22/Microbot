@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 
 import lombok.Value;
-import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeSlots;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
@@ -16,6 +15,7 @@ public class ItemBuyer {
         String name;
         int quantity;
         int customPrice; // -1 to ignore
+        boolean exact;
     }
 
     public static boolean buyItems(List<ItemToBuy> items) {
@@ -23,25 +23,23 @@ public class ItemBuyer {
         for (ItemToBuy item : items) {
             boolean result;
             if (item.customPrice == -1) {
-                result = Rs2GrandExchange.buyItemAboveXPercent(item.name, item.quantity, 100);
+                result = Rs2GrandExchange.buyItemDynamic(item.name, item.quantity, 100, true, item.exact);
             }
             else {
-                result = Rs2GrandExchange.buyItem(item.name, item.customPrice, item.quantity);
+                result = Rs2GrandExchange.buyItem(item.name, item.customPrice, item.quantity, true, item.exact);
             }
             if (!result) {
-                System.out.println("Failed to but " + item.name);
+                System.out.println("Failed to buy " + item.name);
                 return false;
             }
             sleepUntil(Rs2GrandExchange::hasFinishedBuyingOffers);
-            System.out.println(Rs2GrandExchange.getSlot(GrandExchangeSlots.SEVEN));
-            Rs2GrandExchange.collectToBank();
         }
         return true;
     }
 
     public static void ensureAllOffersCollected(boolean closeScreen) {
         sleep(300, 400);
-        Rs2GrandExchange.collectToBank();
+        Rs2GrandExchange.collectAllToBank();
         if (closeScreen) {
             Rs2Keyboard.keyPress(27);
         }

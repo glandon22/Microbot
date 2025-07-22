@@ -1,11 +1,9 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.rfd;
 
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
-import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -16,10 +14,10 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class RFDStart {
     private static final List<ItemBuyer.ItemToBuy> items = List.of(
-            new ItemBuyer.ItemToBuy("fruit blast", 1, 10000),
-            new ItemBuyer.ItemToBuy("eye of newt", 1, 10000),
-            new ItemBuyer.ItemToBuy("greenman's ale", 1, 10000),
-            new ItemBuyer.ItemToBuy("ashes", 1, 10000)
+            new ItemBuyer.ItemToBuy("fruit blast", 1, 10000, false),
+            new ItemBuyer.ItemToBuy("eye of newt", 1, 10000, false),
+            new ItemBuyer.ItemToBuy("greenman's ale", 1, 10000, false),
+            new ItemBuyer.ItemToBuy("ashes", 1, 10000, false)
     );
     private static final List<String> dialogue = Arrays.asList(
             "Do you have any other quests for me?",
