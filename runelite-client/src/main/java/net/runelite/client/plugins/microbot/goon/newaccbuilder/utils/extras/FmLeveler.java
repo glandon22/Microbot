@@ -198,7 +198,7 @@ public class FmLeveler {
                 new BankHandler.QuestItem("tinderbox", 1, false, false ,false)
         ), true, true);
         //this doesnt work if someone else has a campfire out
-        while (Rs2Player.getRealSkillLevel(Skill.FIREMAKING) < 51) {
+        while (Rs2Player.getRealSkillLevel(Skill.FIREMAKING) < 50) {
             logicHandler();
         }
     }

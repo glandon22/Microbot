@@ -62,19 +62,16 @@ public class FightArena {
         DialogueHandler.talkToNPC("head guard", dialogue, 5);
         Rs2Walker.walkTo(2619, 3165, 0);
         MiscellaneousUtilities.setSpell("fire strike");
-        //too much time tanking hits i died
-        // need to stop and revisit this
-        sleep(100000);
-        DialogueHandler.talkToNPC("sammy servil", dialogue, 7);
+        DialogueHandler.talkToNPCCutscene("sammy servil", dialogue, 2);
         sleepUntil(() -> Rs2Npc.getNpc("khazard ogre") != null, 50000);
-        CombatHandler.killMonsterWithPrayer("khazard ogre", Rs2PrayerEnum.PROTECT_MELEE, 10, 5000);
-        DialogueHandler.handleConversation(dialogue, 5);
+        CombatHandler.killMonsterWithPrayer("khazard ogre", Rs2PrayerEnum.PROTECT_MELEE, 10, 2000);
+        DialogueHandler.handleConversationWithCutscene(dialogue, 2);
         sleepUntil(() -> Rs2Npc.getNpc("khazard scorpion") != null, 50000);
-        CombatHandler.killMonsterWithPrayer("khazard scorpion", Rs2PrayerEnum.PROTECT_MELEE, 10, 5000);
-        DialogueHandler.handleConversation(dialogue, 3);
+        CombatHandler.killMonsterWithPrayer("khazard scorpion", Rs2PrayerEnum.PROTECT_MELEE, 10, 2000);
+        DialogueHandler.handleConversationWithCutscene(dialogue, 2);
         sleepUntil(() -> Rs2Npc.getNpc("bouncer") != null, 50000);
-        CombatHandler.killMonsterWithPrayer("bouncer", Rs2PrayerEnum.PROTECT_MELEE, 10, 5000);
-        DialogueHandler.handleConversation(dialogue, 3);
+        CombatHandler.killMonsterWithPrayer("bouncer", Rs2PrayerEnum.PROTECT_MELEE, 10, 2000);
+        DialogueHandler.handleConversationWithCutscene(dialogue, 2);
         Rs2GameObject.interact(46563, "quick-escape");
         sleep(5000);
         Rs2Walker.walkTo(2610, 3149, 0, 1);

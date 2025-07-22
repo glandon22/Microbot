@@ -18,6 +18,7 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.knightsswo
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.monksfriend.MonksFriend;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.naturalhistoryquiz.NaturalHistoryQuiz;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.plaguecity.PlagueCity;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.rfd.RFDStart;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.romeoandjuliet.RomeoAndJuliet;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.runemysteries.RuneMysteries;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.seaslug.SeaSlug;
@@ -29,7 +30,10 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witcheshou
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witchespotion.WitchesPotion;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.PotTrainer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.TeaStallStealFletch;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLeveler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.GlassBlower;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
 import net.runelite.client.plugins.microbot.prayer.GildedAltarConfig;
@@ -202,6 +206,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron ore", 2, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("copper ore", 4, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("falador teleport", 100, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("teleport to house", 100, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw chicken", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw beef", 2, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw bear meat", 1, 3000));
@@ -212,7 +217,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("rope", 10, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("games necklace(8)", 3, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("skills necklace(4)", 1, -1));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ring of dueling(8)", 1, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ring of dueling(8)", 11, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("khazard teleport", 5, -1));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dwellberries", 1, 1000));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("spade", 1, 1000));
@@ -314,12 +319,24 @@ public class NewAccBuilderScript extends Script {
                 grandTree.completeQuest();
                 treeGnomeVillage.completeQuest();
                 monksFriend.completeQuest();
-                plagueCity.completeQuest();*/
+                plagueCity.completeQuest();
                 Rs2Walker.walkTo(3161, 3489, 0);
                 fmLeveler.levelUp();
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();
                 fightArena.completeQuest();
+                TeaStallStealFletch.run();
+                PotTrainer.run();
+                GlassBlower.run();
+                MiscellaneousUtilities.cowMagerAndRanger();
+                MiscellaneousUtilities.getPOH();
+                MiscellaneousUtilities.makeAirRunes();
+                MiscellaneousUtilities.sardineCooker();*/
+                BankHandler.withdrawQuestItems(List.of(
+                        new BankHandler.QuestItem("lumbridge teleport", 1, false, false, false),
+                        new BankHandler.QuestItem("varrock teleport", 2, false, false, false)
+                ), true, true);
+                RFDStart.completeQuest();
                 System.out.println("shutting down");
                 shutdown();
             } catch (Exception ex) {

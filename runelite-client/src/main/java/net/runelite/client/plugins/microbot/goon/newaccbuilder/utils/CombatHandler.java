@@ -23,4 +23,18 @@ public class CombatHandler {
             }
         }
     }
+
+    public static void killMonster(String monsterName, int fightTimeout) {
+        long lastSeenDemon = System.currentTimeMillis();
+        System.out.println("starting");
+        while (System.currentTimeMillis() - lastSeenDemon < fightTimeout) {
+            Rs2NpcModel monster = Rs2Npc.getNpc(monsterName);
+            if (monster != null) lastSeenDemon = System.currentTimeMillis();
+
+            if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
+            else if (monster != null) {
+                Rs2Npc.interact(monster, "attack");
+            }
+        }
+    }
 }

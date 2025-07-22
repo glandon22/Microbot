@@ -44,6 +44,7 @@ public class SeaSlug {
     }
 
     public void completeQuest() {
+        // got stuck in a dialogue with the sailor guy on the platform who takes you to and from
         prep();
         Rs2Walker.walkTo(2710, 3306, 0);
         DialogueHandler.talkToNPC("caroline", dialogue, 5);
@@ -77,6 +78,8 @@ public class SeaSlug {
         sleepUntil(() -> Rs2Inventory.hasItem(1468));
         Rs2Inventory.interact(1468, "rub-together");
         sleepUntil(() -> Rs2Inventory.hasItem("lit torch"));
+        // item is there but this animation goes on for a while and i cant move
+        sleep(15000);
         Rs2Walker.walkTo(2782,3286,0);
         Rs2GameObject.interact(18324, "climb-up");
         sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() == 1);

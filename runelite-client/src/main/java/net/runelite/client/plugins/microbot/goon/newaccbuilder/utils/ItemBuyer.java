@@ -18,7 +18,7 @@ public class ItemBuyer {
         int customPrice; // -1 to ignore
     }
 
-    public boolean buyItems(List<ItemToBuy> items) {
+    public static boolean buyItems(List<ItemToBuy> items) {
         Rs2GrandExchange.openExchange();
         for (ItemToBuy item : items) {
             boolean result;
@@ -39,7 +39,7 @@ public class ItemBuyer {
         return true;
     }
 
-    public void ensureAllOffersCollected(boolean closeScreen) {
+    public static void ensureAllOffersCollected(boolean closeScreen) {
         sleep(300, 400);
         Rs2GrandExchange.collectToBank();
         if (closeScreen) {

@@ -44,9 +44,49 @@ public class DialogueHandler {
         return false;
     }
 
+    public static boolean handleConversationWithCutscene(List<String> questions, int timeout) {
+        // might add support to not timeout during cutscenes? should test this
+        // dont modify the original
+        List<String> questionsCopy = new ArrayList<>(questions);
+        long lastDialogue = System.currentTimeMillis();
+        while (System.currentTimeMillis() - lastDialogue < timeout * 1000L) {
+            if (Rs2Dialogue.isInDialogue() || Rs2Dialogue.isInCutScene()) {
+                lastDialogue = System.currentTimeMillis();
+            }
+
+            if (Rs2Dialogue.isInDialogue()) {
+                if (Rs2Dialogue.hasSelectAnOption()) {
+                    List<Widget> dialogueOptions = Rs2Dialogue.getDialogueOptions();
+                    for (Widget option : dialogueOptions) {
+                        Iterator<String> iterator = questionsCopy.iterator();
+                        while (iterator.hasNext()) {
+                            if (option.getText().contains(iterator.next())) {
+                                Rs2Dialogue.keyPressForDialogueOption(option.getIndex());
+                                iterator.remove();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                else Rs2Dialogue.clickContinue();
+            }
+        }
+        if (questionsCopy.isEmpty()) {
+            System.out.println("we have completed dialogue");
+            return true;
+        }
+        return false;
+    }
+
     public static void talkToNPC(String name, List<String> lines, int timeout) {
         Rs2Npc.interact(name, "talk-to");
         DialogueHandler.handleConversation(lines, timeout);
+    }
+
+    public static void talkToNPCCutscene(String name, List<String> lines, int timeout) {
+        Rs2Npc.interact(name, "talk-to");
+        DialogueHandler.handleConversationWithCutscene(lines, timeout);
     }
 
     //last lines is to prevent selecting "goodbye" first and missing everything
