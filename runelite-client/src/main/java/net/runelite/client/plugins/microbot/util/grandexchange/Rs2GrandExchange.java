@@ -2,12 +2,11 @@ package net.runelite.client.plugins.microbot.util.grandexchange;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.util.Objects;
-import java.util.function.Predicate;
 import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.VarClientStr;
+import net.runelite.api.annotations.Component;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
@@ -25,7 +24,6 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Encryption;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.api.annotations.Component;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -37,11 +35,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static net.runelite.client.plugins.microbot.util.Global.*;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class Rs2GrandExchange
 {
@@ -196,22 +197,26 @@ public class Rs2GrandExchange
 			case BUY:
 				Widget buyOffer = GrandExchangeWidget.getOfferBuyButton(
 					request.getSlot() != null ? request.getSlot() : getAvailableSlot());
-				System.out.println("1");
 				if (buyOffer == null) break;
-				System.out.println("2");
+
 				Rs2Widget.clickWidgetFast(buyOffer);
 				sleepUntil(GrandExchangeWidget::isOfferTextVisible);
-				System.out.println("3");
+
+
 				Rs2Widget.sleepUntilHasWidgetText("Start typing the name of an item to search for it", 162, 51, false, 5000);
+				String searchName = request.getItemName();
+				if (searchName.length() >= 26) {
+					searchName = searchName.substring(0, 25); // Grand Exchange item names are limited to 25 characters.
+				}
 				Rs2Keyboard.typeString(request.getItemName());
 
-				if (!Rs2Widget.sleepUntilHasWidgetText(request.getItemName(), 162, 38, request.isExact(), 5000)) break;
-				System.out.println("4");
-				sleep(1800); // TODO: make this conditional.
+				if (!Rs2Widget.sleepUntilHasWidgetText(searchName, 162, 43, false, 5000)) break;
+
+				sleepUntil(() -> getSearchResultWidget(request.getItemName(), request.isExact()) != null, 2200);
 
 				Pair<Widget, Integer> itemResult = getSearchResultWidget(request.getItemName(), request.isExact());
 				if (itemResult == null) break;
-				System.out.println("5");
+
 				Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
 				sleepUntil(() -> GrandExchangeWidget.getPricePerItemButton_X() != null);
 
@@ -494,81 +499,6 @@ public class Rs2GrandExchange
 		return processOffer(request);
 	}
 
-	public static boolean buyItem(String itemName, int price, int quantity, boolean toBank, boolean exact)
-	{
-		GrandExchangeRequest request = GrandExchangeRequest.builder()
-				.action(GrandExchangeAction.BUY)
-				.itemName(itemName)
-				.price(price)
-				.quantity(quantity)
-				.toBank(toBank)
-				.exact(exact)
-				.build();
-		return processOffer(request);
-	}
-
-	/**
-	 * Creates and processes a {@link GrandExchangeRequest} to buy an item on the Grand Exchange.
-	 * <p>
-	 * This method constructs a {@code BUY} type request using the specified item name, price, and quantity,
-	 * and delegates the logic to {@link #processOffer(GrandExchangeRequest)} to execute the buy action.
-	 *
-	 * @param itemName the name of the item to buy
-	 * @param price the price per item in coins
-	 * @param quantity the number of items to buy
-	 * @param toBank withdraw to bank or not
-	 * @return {@code true} if the buy offer was successfully placed; {@code false} otherwise
-	 */
-	public static boolean buyItem(String itemName, int price, int quantity, boolean toBank)
-	{
-		GrandExchangeRequest request = GrandExchangeRequest.builder()
-				.action(GrandExchangeAction.BUY)
-				.itemName(itemName)
-				.price(price)
-				.quantity(quantity)
-				.toBank(toBank)
-				.build();
-		return processOffer(request);
-	}
-
-	/**
-	 * Creates and processes a {@link GrandExchangeRequest} to buy an item on the Grand Exchange.
-	 * <p>
-	 * This method constructs a {@code BUY} type request using the specified item name, price, and quantity,
-	 * and delegates the logic to {@link #processOffer(GrandExchangeRequest)} to execute the buy action.
-	 *
-	 * @param itemName the name of the item to buy
-	 * @param priceAboveAsk the percent above current ask price per item in coins
-	 * @param quantity the number of items to buy
-	 * @return {@code true} if the buy offer was successfully placed; {@code false} otherwise
-	 */
-	public static boolean buyItemDynamic(String itemName, int priceAboveAsk, int quantity, boolean toBank)
-	{
-		int offerPrice = (int)(getOfferPrice() * priceAboveAsk) / 100;
-		GrandExchangeRequest request = GrandExchangeRequest.builder()
-				.action(GrandExchangeAction.BUY)
-				.itemName(itemName)
-				.price(offerPrice)
-				.quantity(quantity)
-				.toBank(toBank)
-				.build();
-		return processOffer(request);
-	}
-
-	public static boolean buyItemDynamic(String itemName, int priceAboveAsk, int quantity, boolean toBank, boolean exact)
-	{
-		int offerPrice = (int)(getOfferPrice() * priceAboveAsk) / 100;
-		GrandExchangeRequest request = GrandExchangeRequest.builder()
-				.action(GrandExchangeAction.BUY)
-				.itemName(itemName)
-				.price(offerPrice)
-				.quantity(quantity)
-				.toBank(toBank)
-				.exact(exact)
-				.build();
-		return processOffer(request);
-	}
-
 	/**
 	 * Confirms the current Grand Exchange offer.
 	 * <p>
@@ -579,7 +509,7 @@ public class Rs2GrandExchange
 	private static void confirm()
 	{
 		Rs2Widget.clickWidget(GrandExchangeWidget.getConfirm());
-		sleepUntil(() -> Rs2Widget.hasWidget("Your offer is much higher") || Rs2Widget.hasWidget("Select an offer slot"), 2000);
+		sleepUntil(() -> Rs2Widget.hasWidget("Your offer is much"), 2000);
 		if (Rs2Widget.hasWidget("Your offer is much"))
 		{
 			Rs2Widget.clickWidget("Yes");
@@ -909,15 +839,12 @@ public class Rs2GrandExchange
 			return null;
 		}
 
-		Widget child = Arrays.stream(parent.getChildren())
-				.filter(x -> {
-					String widgetText = Rs2UiHelper.stripColTags(x.getText());
-					boolean matches = exact ? widgetText.equalsIgnoreCase(search) : widgetText.toLowerCase().contains(search.toLowerCase());
-					System.out.println("Widget text: '" + widgetText + "', Search: '" + search + "', Exact: " + exact + ", Matches: " + matches);
-					return matches;
-				})
-				.findFirst()
-				.orElse(null);
+		Widget child = Arrays.stream(parent.getChildren()).filter(x -> {
+				String widgetText = Rs2UiHelper.stripColTags(x.getText());
+				return exact ? widgetText.equalsIgnoreCase(search) : widgetText.toLowerCase().contains(search.toLowerCase());
+			})
+			.findFirst()
+			.orElse(null);
 
 		if (child != null)
 		{
@@ -1202,5 +1129,17 @@ public class Rs2GrandExchange
 		return Arrays.stream(GrandExchangeSlots.values())
 			.limit(maxSlots)
 			.filter(Rs2GrandExchange::isSlotAvailable).toArray(GrandExchangeSlots[]::new);
+	}
+
+	/**
+	 * Returns the count of currently available Grand Exchange slots.
+	 * <p>
+	 * This method counts the number of slots that are available for new offers.
+	 *
+	 * @return the number of available Grand Exchange slots
+	 */
+	public static int getAvailableSlotsCount()
+	{
+		return (int) Arrays.stream(getAvailableSlots()).count();
 	}
 }
