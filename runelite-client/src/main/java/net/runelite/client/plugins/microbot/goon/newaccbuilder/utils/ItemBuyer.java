@@ -21,12 +21,15 @@ public class ItemBuyer {
     public static boolean buyItems(List<ItemToBuy> items) {
         Rs2GrandExchange.openExchange();
         for (ItemToBuy item : items) {
+            System.out.println("purchasing item: " + item.name);
             boolean result;
             if (item.customPrice == -1) {
-                result = Rs2GrandExchange.buyItemDynamic(item.name, item.quantity, 100, true, item.exact);
+                System.out.println("buying item with defautl price");
+                result = Rs2GrandExchange.buyItemDynamic(item.name, 99, item.quantity, true, true, item.exact);
             }
             else {
-                result = Rs2GrandExchange.buyItem(item.name, item.customPrice, item.quantity, true, item.exact);
+                System.out.println("biying item with custom price");
+                result = Rs2GrandExchange.buyItem(item.name, item.customPrice, item.quantity, true, true, item.exact);
             }
             if (!result) {
                 System.out.println("Failed to buy " + item.name);

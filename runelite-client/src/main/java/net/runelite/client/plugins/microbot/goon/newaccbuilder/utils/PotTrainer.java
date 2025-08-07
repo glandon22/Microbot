@@ -22,7 +22,7 @@ public class PotTrainer {
     }
 
     public static void run() {
-        //prep();
+        prep();
         while (true) {
             if (Microbot.isGainingExp) continue;
             else if (Rs2Inventory.hasItem("eye of newt") && Rs2Inventory.hasItem("guam potion (unf)")) {

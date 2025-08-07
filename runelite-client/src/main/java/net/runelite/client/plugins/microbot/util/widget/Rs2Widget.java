@@ -267,8 +267,6 @@ public class Rs2Widget {
     private static boolean matchesText(Widget widget, String text, boolean exact) {
         String cleanText = Rs2UiHelper.stripColTags(widget.getText());
         String cleanName = Rs2UiHelper.stripColTags(widget.getName());
-        //162,38
-        System.out.println("cleanText: '" + cleanText + "', cleanName: '" + cleanName + "', text: '" + text + "'");
         if (exact) {
             if (cleanText.equalsIgnoreCase(text) || cleanName.equalsIgnoreCase(text)) return true;
         } else {

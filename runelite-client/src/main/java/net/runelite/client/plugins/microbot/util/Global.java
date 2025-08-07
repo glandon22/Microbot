@@ -64,6 +64,23 @@ public class Global {
         return sleepUntil(awaitedCondition, 5000);
     }
 
+    public static boolean doUntil(BooleanSupplier awaitedCondition, Runnable action, int actionInterval, int timeout) {
+        long lastAction = System.currentTimeMillis() - actionInterval * 2L;
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < timeout) {
+            if (awaitedCondition.getAsBoolean()) {
+                return true;
+            }
+
+            else if (System.currentTimeMillis() - lastAction > actionInterval) {
+                action.run();
+                lastAction = System.currentTimeMillis();
+            }
+        }
+
+        return false;
+    }
+
     public static boolean sleepUntil(BooleanSupplier awaitedCondition, int time) {
         if (Microbot.getClient().isClientThread()) return false;
         boolean done = false;

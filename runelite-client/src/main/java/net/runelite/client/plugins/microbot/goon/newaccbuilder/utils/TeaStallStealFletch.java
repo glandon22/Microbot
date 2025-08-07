@@ -36,8 +36,8 @@ public class TeaStallStealFletch {
         }
     }
     public static void run() {
-        /*prep();
-        Rs2Walker.walkTo(3268, 3412, 0);*/
+        prep();
+        Rs2Walker.walkTo(3268, 3412, 0);
         while (Rs2Inventory.hasItem("feather") && Rs2Inventory.hasItem("arrow shaft")) {
             core();
         }

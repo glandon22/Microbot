@@ -24,7 +24,11 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witcheshou
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witchespotion.WitchesPotion;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.PotTrainer;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.TeaStallStealFletch;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLeveler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.GlassBlower;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
 
 import java.util.ArrayList;
@@ -153,7 +157,7 @@ public class NewAccBuilderScript extends Script {
         );
 
         ArrayList<ItemBuyer.ItemToBuy> necessaryAccountItems = new ArrayList<>();
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("egg", 1, 5000, true));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("egg", 2, 5000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pot of flour", 1, 5000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of milk", 1, 5000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("red bead", 1, 5000, false));
@@ -168,7 +172,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron scimitar", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("eye of newt", 1000, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("onion", 1, 1000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("garlic", 1, 1000, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("garlic", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("hammer", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("cadava berries", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("beer", 1, 1000, false));
@@ -240,8 +244,11 @@ public class NewAccBuilderScript extends Script {
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                //gonna have to fix this and set exact names for shit
-                ItemBuyer.buyItems(necessaryAccountItems);
+                ItemBuyer.buyItems(List.of(
+                        new ItemBuyer.ItemToBuy("staff of air", 1, -1, false),
+                        new ItemBuyer.ItemToBuy("copper ore", 4, 500, false)
+                ));
+                //ItemBuyer.buyItems(necessaryAccountItems);
                 //should change this to buy everything first then go down and do quests
                 /*cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
@@ -306,14 +313,14 @@ public class NewAccBuilderScript extends Script {
                 fmLeveler.levelUp();
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();
-                fightArena.completeQuest();
+                fightArena.completeQuest();*/
                 TeaStallStealFletch.run();
                 PotTrainer.run();
                 GlassBlower.run();
                 MiscellaneousUtilities.cowMagerAndRanger();
                 MiscellaneousUtilities.getPOH();
                 MiscellaneousUtilities.makeAirRunes();
-                MiscellaneousUtilities.sardineCooker();*/
+                MiscellaneousUtilities.sardineCooker();
                 BankHandler.withdrawQuestItems(List.of(
                         new BankHandler.QuestItem("lumbridge teleport", 1, false, false, false),
                         new BankHandler.QuestItem("varrock teleport", 2, false, false, false)

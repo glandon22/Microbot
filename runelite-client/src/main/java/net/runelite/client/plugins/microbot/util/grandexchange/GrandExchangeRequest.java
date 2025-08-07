@@ -57,6 +57,11 @@ public class GrandExchangeRequest
 	private final boolean closeAfterCompletion;
 
 	/**
+	 * Whether to collect the items directly after purchasing.
+	 */
+	private final boolean buyAndCollect;
+
+	/**
 	 * Whether to collect the items directly to the bank instead of the inventory.
 	 */
 	private final boolean toBank;

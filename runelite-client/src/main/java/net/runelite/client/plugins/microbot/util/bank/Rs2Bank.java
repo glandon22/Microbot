@@ -146,7 +146,7 @@ public class Rs2Bank {
      */
     public static boolean isOpen() {
         if (!handleBankPin()) return false;
-        return Rs2Widget.hasWidgetText("Rearrange mode", 12, 18, false);
+        return Rs2Widget.hasWidgetText("Rearrange mode", 12, 18, false, true);
     }
 
     public static List<Rs2ItemModel> bankItems() {
