@@ -1,11 +1,14 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras;
 
+import net.runelite.api.GameObject;
 import net.runelite.api.Skill;
+import net.runelite.api.TileObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.bossing.giantmole.enums.State;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -25,6 +28,7 @@ import java.util.List;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban.WOODCUTTING_ANIMS;
 import static net.runelite.client.plugins.microbot.util.player.Rs2Player.isMember;
 
 public class MiscellaneousUtilities {
@@ -155,7 +159,8 @@ public class MiscellaneousUtilities {
             if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
             else Rs2Npc.attack("cow");
         }
-        Rs2Inventory.equip("iron dart");
+        Rs2Inventory.wield("iron dart");
+        sleep(1200);
         while (Rs2Player.hasPlayerEquippedItem(Rs2Player.getLocalPlayer(), "iron dart")) {
             if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
             else Rs2Npc.attack("cow");
@@ -236,6 +241,68 @@ public class MiscellaneousUtilities {
                 boolean result = sleepUntil(() -> Rs2Inventory.hasItem("raw sardine"), 5000);
                 if (!result) return;
             }
+        }
+    }
+
+    public static void wtPrep() {
+        final List<ItemBuyer.ItemToBuy> items = List.of(
+                new ItemBuyer.ItemToBuy("polar camo top", 1, 25000, false),
+                new ItemBuyer.ItemToBuy("polar camo legs", 1, 25000, false),
+                new ItemBuyer.ItemToBuy("fire tiara", 1, 2500, false),
+                new ItemBuyer.ItemToBuy("cake", 1000, -1, true),
+                new ItemBuyer.ItemToBuy("grey gloves", 1, 10000, false)
+        );
+        walkToGE();
+        ItemBuyer.buyItems(items);
+        ItemBuyer.ensureAllOffersCollected(true);
+        BankHandler.withdrawQuestItems(List.of(
+                new BankHandler.QuestItem("polar camo top", 1, false, false, true),
+                new BankHandler.QuestItem("polar camo legs", 1, false, false, true),
+                new BankHandler.QuestItem("fire tiara", 1, false, false, true),
+                new BankHandler.QuestItem("grey gloves", 1, false, false, true),
+                new BankHandler.QuestItem("games necklace", 1, false, false, true),
+                new BankHandler.QuestItem("adamant axe", 1, false, false, true),
+                new BankHandler.QuestItem("knife", 1, false, false, false),
+                new BankHandler.QuestItem("tinderbox", 1, false, false, false),
+                new BankHandler.QuestItem("falador teleport", 1, false, false, false)
+        ), true, true);
+        Rs2Walker.walkTo(3053, 3247, 0);
+        List<String> dialogue = List.of(
+                "That's great, can you take me there please?",
+                "Goodbye."
+        );
+        DialogueHandler.talkToNPC("veos", dialogue, 15);
+        Rs2Walker.walkTo(1634, 3938, 0);
+    }
+
+    public static void levelWc() {
+        walkToGE();
+        ItemBuyer.buyItems(List.of(
+                new ItemBuyer.ItemToBuy("steel axe", 1, 5000, false),
+                new ItemBuyer.ItemToBuy("mithril axe", 1, 5000, false),
+                new ItemBuyer.ItemToBuy("adamant axe", 1, 5000, false)
+        ));
+        BankHandler.withdrawQuestItems(List.of(
+                new BankHandler.QuestItem("steel axe", 1, false, false, true),
+                new BankHandler.QuestItem("mithril axe", 1, false, false, false),
+                new BankHandler.QuestItem("adamant axe", 1, false, false, false)
+        ), true, true);
+        Rs2Walker.walkTo(3160, 3454, 0);
+        while (Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING) < 15) {
+            if (WOODCUTTING_ANIMS.contains(Rs2Player.getAnimation())) continue;
+            else if (Rs2Inventory.isFull()) Rs2Inventory.dropAll("logs");
+            GameObject tree = Rs2GameObject.getGameObject("tree", true);
+            if (tree != null) Rs2GameObject.interact(tree, "chop down");
+            else Rs2Walker.walkTo(3160, 3454, 0);
+        }
+        Rs2Inventory.dropAll("logs");
+        Rs2Walker.walkTo(3165, 3416, 0);
+        while (Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING) < 31) {
+            if (WOODCUTTING_ANIMS.contains(Rs2Player.getAnimation())) continue;
+            else if (Rs2Inventory.isFull()) Rs2Inventory.dropAll("oak logs");
+            GameObject tree = Rs2GameObject.getGameObject("oak tree", true);
+            if (tree != null) Rs2GameObject.interact(tree, "chop down");
+            else Rs2Walker.walkTo(3165, 3416, 0);
         }
     }
 }

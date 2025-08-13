@@ -599,7 +599,14 @@ public class Rs2Npc {
                 return false;
             }
 
-            action = actions[index];
+            try {
+                action = actions[index];
+            } catch (ArrayIndexOutOfBoundsException e) {
+                Arrays.stream(actions).forEach(item -> System.out.println("action: " + item));
+                // Handle invalid index
+                System.out.println("Error: Index " + index + " is out of bounds for array of length " + actions.length);
+                return false;
+            }
 
             if (!Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
                 Rs2Camera.turnTo(npc);

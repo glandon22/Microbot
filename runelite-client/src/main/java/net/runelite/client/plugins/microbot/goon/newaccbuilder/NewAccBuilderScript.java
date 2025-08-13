@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.knightsswo
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.monksfriend.MonksFriend;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.naturalhistoryquiz.NaturalHistoryQuiz;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.plaguecity.PlagueCity;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.rfd.RFDGoblins;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.rfd.RFDStart;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.romeoandjuliet.RomeoAndJuliet;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.runemysteries.RuneMysteries;
@@ -30,6 +31,7 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLe
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.GlassBlower;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
+import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,10 +170,10 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("staff of air", 1, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("amulet of glory(6)", 1, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("necklace of passage(5)", 3, -1, false));
-        //necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dragon bones", 215, -1));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dragon bones", 215, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron scimitar", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("eye of newt", 1000, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("onion", 1, 1000, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("onion", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("garlic", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("hammer", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("cadava berries", 1, 1000, false));
@@ -188,7 +190,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("yellow dye", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("clay", 6, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron ore", 2, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("copper ore", 4, -1, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("copper ore", 4, 500, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("falador teleport", 100, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("teleport to house", 100, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw chicken", 1, 1000, false));
@@ -204,7 +206,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ring of dueling(8)", 11, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("khazard teleport", 5, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("dwellberries", 1, 1000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("spade", 1, 1000, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("spade", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("chocolate dust", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("snape grass", 1, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("bucket of milk", 1, 1000, false));
@@ -226,31 +228,21 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron dart", 2000, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw sardine", 600, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("steel nails", 2000, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("saw", 1, 1000, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("saw", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("tinderbox", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("plank", 1, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pure essence", 1000, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("air tiara", 1, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("glassblowing pipe", 1, 1000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("trout", 100, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("prayer potion(4)", 10, -1, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("trout", 100, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe top", 1, 3000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000, false));
-        // add some random junk on the end in case i fail to withdraw everything from ge bc of delays etc
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000, false));
-
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("monk's robe", 1, 3000, true));
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                ItemBuyer.buyItems(List.of(
-                        new ItemBuyer.ItemToBuy("staff of air", 1, -1, false),
-                        new ItemBuyer.ItemToBuy("copper ore", 4, 500, false)
-                ));
-                //ItemBuyer.buyItems(necessaryAccountItems);
-                //should change this to buy everything first then go down and do quests
-                /*cooksAssistant.completeQuest();
+                /*ItemBuyer.buyItems(necessaryAccountItems);
+                cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
                 Rs2Walker.walkTo(3293, 3379, 0);
                 Rs2Walker.walkTo(3278, 3428, 0);
@@ -313,10 +305,11 @@ public class NewAccBuilderScript extends Script {
                 fmLeveler.levelUp();
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();
-                fightArena.completeQuest();*/
+                fightArena.completeQuest();
                 TeaStallStealFletch.run();
                 PotTrainer.run();
                 GlassBlower.run();
+                MiscellaneousUtilities.levelWc();*/
                 MiscellaneousUtilities.cowMagerAndRanger();
                 MiscellaneousUtilities.getPOH();
                 MiscellaneousUtilities.makeAirRunes();
@@ -326,6 +319,8 @@ public class NewAccBuilderScript extends Script {
                         new BankHandler.QuestItem("varrock teleport", 2, false, false, false)
                 ), true, true);
                 RFDStart.completeQuest();
+                RFDGoblins.completeQuest();
+                MiscellaneousUtilities.wtPrep();
                 System.out.println("shutting down");
                 shutdown();
             } catch (Exception ex) {

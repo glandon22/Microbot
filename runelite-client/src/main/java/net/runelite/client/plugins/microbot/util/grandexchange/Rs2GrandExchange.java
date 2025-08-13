@@ -11,6 +11,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.globval.WidgetIndices;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2AntibanSettings;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.bank.enums.BankLocation;
@@ -552,6 +553,7 @@ public class Rs2GrandExchange
 	 */
 	private static void setPrice(int price)
 	{
+		System.out.println("pp" + price + ":" + getOfferPrice());
 		if (price != getOfferPrice())
 		{
 			Widget pricePerItemButtonX = GrandExchangeWidget.getPricePerItemButton_X();
@@ -1249,6 +1251,31 @@ public class Rs2GrandExchange
 		return collectOffer(request.isToBank());
 	}
 
+	private static boolean collectGoonV2(GrandExchangeRequest request) {
+		GrandExchangeOffer[] offers = Microbot.getClient().getGrandExchangeOffers();
+
+		while (true) {
+			GrandExchangeSlots[] slots = GrandExchangeSlots.values();
+			for (int i = 0; i < slots.length; i++) {
+				GrandExchangeSlots slot = slots[i];
+				if (request.getSlot() == null || request.getSlot() == slot) {
+					Widget offerSlot = GrandExchangeWidget.getSlot(slot);
+					if (offerSlot == null) continue;
+					Widget itemNameWidget = offerSlot.getChild(19);
+					if (itemNameWidget == null || itemNameWidget.getText() == null) continue;
+					String currentItemName = itemNameWidget.getText();
+					boolean doesItemMatch = request.isExact()
+							? currentItemName.equalsIgnoreCase(request.getItemName())
+							: currentItemName.toLowerCase().contains(request.getItemName().toLowerCase());
+
+					if (!doesItemMatch) continue;
+					if (offers[i].getState() != GrandExchangeOfferState.BOUGHT) continue;
+					return collectAll(request.isToBank());
+				}
+			}
+		}
+	}
+
 	public static boolean processOfferGoon(GrandExchangeRequest request) {
 		if (!isValidRequest(request) || !useGrandExchange()) {
 			return false;
@@ -1258,7 +1285,7 @@ public class Rs2GrandExchange
 
 		switch (request.getAction()) {
 			case COLLECT:
-				success = collectGoon(request);
+				success = collectGoonV2(request);
 				break;
 
 			case BUY:
@@ -1295,11 +1322,17 @@ public class Rs2GrandExchange
 				);
 
 				int purchasePrice;
-				purchasePrice = request.getPercent() != 0 ? request.getPrice() * (1 + request.getPercent()) : request.getPrice();
-				System.out.println("Setting purchase price");
+				System.out.println("price: " + request.getPrice());
+				System.out.println("percent: " + request.getPercent());
+				int defaultOffer = getOfferPrice();
+				System.out.println("default offer: " + defaultOffer);
+				float offerMod = 1 + (float) request.getPercent() / 100;
+				System.out.println("offer mod: " + 1 + request.getPercent() / 100);
+				purchasePrice = request.getPrice() != 0 ? request.getPrice() : (int) (defaultOffer * offerMod);
+				System.out.println("Setting purchase price: " + purchasePrice);
 				doUntil(
-						() -> Rs2Widget.hasWidgetText(addCommasToNumberString(String.valueOf(purchasePrice)), 465, 26, false),
-						()	-> setPrice(purchasePrice),
+						() -> Objects.requireNonNull(Rs2Widget.getWidget(465, 26).getChild(41)).getText().contains(addCommasToNumberString(String.valueOf(purchasePrice))),
+						() -> setPrice(purchasePrice),
 						3000,
 						100000
 				);
@@ -1310,9 +1343,7 @@ public class Rs2GrandExchange
 				success = sleepUntil(() -> !isOfferScreenOpen());
 				if (request.isBuyAndCollect()) {
 					System.out.println("collecting item");
-					sleep(900);
-					sleepUntil(Rs2GrandExchange::hasFinishedBuyingOffers);
-					success = collectGoon(request);
+					success = collectGoonV2(request);
 				}
 				break;
 

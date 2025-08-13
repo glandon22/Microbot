@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 
 import net.runelite.api.widgets.Widget;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import static net.runelite.client.plugins.microbot.util.Global.doUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class DialogueHandler {
@@ -80,7 +82,13 @@ public class DialogueHandler {
     }
 
     public static void talkToNPC(String name, List<String> lines, int timeout) {
-        Rs2Npc.interact(name, "talk-to");
+        doUntil(
+                Rs2Dialogue::isInDialogue,
+                () -> Rs2Npc.interact(name, "talk-to"),
+                5000,
+                100000
+        );
+        Microbot.log("Sucessfully started conversation with " + name);
         DialogueHandler.handleConversation(lines, timeout);
     }
 

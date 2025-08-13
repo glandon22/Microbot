@@ -746,6 +746,19 @@ public class Rs2GameObject {
         return getGameObject(o -> o.getId() == id, anchor, distance);
     }
 
+    public static GameObject getGameObject(int id, WorldPoint anchor, boolean exact) {
+        if (exact) {
+            Stream<GameObject> allGameObjects = getSceneObjects(GAMEOBJECT_EXTRACTOR);
+
+            return allGameObjects
+                    .filter(obj -> obj.getWorldLocation().getX() == anchor.getX() && obj.getWorldLocation().getY() == anchor.getY() && obj.getWorldLocation().getPlane() == anchor.getPlane() && obj.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        else return getGameObject(id, anchor, (Constants.SCENE_SIZE / 2));
+    }
+
     public static GameObject getGameObject(Integer[] ids) {
         Set<Integer> idSet = Stream.of(ids).collect(Collectors.toSet());
         return getGameObject(o -> idSet.contains(o.getId()));
