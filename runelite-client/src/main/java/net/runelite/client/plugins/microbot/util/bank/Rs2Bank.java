@@ -2103,10 +2103,14 @@ public class Rs2Bank {
     }
 
     private static final int NOTED_TOGGLE_WIDGET = 786458;
+    private static final int ITEM_TOGGLE_WIDGET = 786457;
 
     public static boolean setWithdrawAs(boolean noted) {
         if (isWithdrawAs(noted)) return true;
-        Rs2Widget.clickWidget(NOTED_TOGGLE_WIDGET);
+
+        if (noted) Rs2Widget.clickWidget(NOTED_TOGGLE_WIDGET);
+        else Rs2Widget.clickWidget(ITEM_TOGGLE_WIDGET);
+
         return sleepUntil(() -> isWithdrawAs(noted));
     }
 
