@@ -207,10 +207,7 @@ public class FletchingScript extends Script {
             Rs2Keyboard.keyPress(option);
         }
 
-        sleepUntil(() ->
-                        !Rs2Inventory.hasItem(secondaryItemToFletch) ||
-                        hasLeveledUp,
-                60000);
+        sleepUntil(() -> !Rs2Inventory.hasItem(secondaryItemToFletch), 60000);
         Rs2Antiban.actionCooldown();
         Rs2Antiban.takeMicroBreakByChance();
         Rs2Bank.preHover();
@@ -288,13 +285,5 @@ public class FletchingScript extends Script {
 
         Rs2Antiban.resetAntibanSettings();
         super.shutdown();
-    }
-
-    public void onWidgetLoaded(WidgetLoaded event) {
-        if (event.getGroupId() == FLETCHING_WIDGET_GROUP_ID) {
-            hasLeveledUp = false;
-            Microbot.status = "Fletching";
-            Microbot.showMessage(Microbot.status);
-        }
     }
 }

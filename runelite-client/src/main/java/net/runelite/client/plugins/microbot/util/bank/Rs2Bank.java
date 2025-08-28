@@ -74,10 +74,6 @@ public class Rs2Bank {
     public static final int BANK_ITEM_HEIGHT = 32;
     public static final int BANK_ITEM_Y_PADDING = 4;
     public static final int BANK_ITEMS_PER_ROW = 8;
-    private static final int X_AMOUNT_VARBIT = VarbitID.BANK_REQUESTEDQUANTITY;
-    private static final int SELECTED_OPTION_VARBIT = VarbitID.BANK_QUANTITY_TYPE;
-
-    private static final int WITHDRAW_AS_NOTE_VARBIT = 3958;
 
     // Bank data caching system
     private static final String CONFIG_GROUP = "microbot";
@@ -218,7 +214,7 @@ public class Rs2Bank {
      * @param names A list of item names to check for.
      * @return True if any of the items are found, false otherwise.
      */
-    public static boolean hasItem(List<String> names) {
+    public static boolean hasItem(Collection<String> names) {
         return hasItem(names, false, 1);
     }
 
@@ -229,7 +225,7 @@ public class Rs2Bank {
      * @param exact If true, requires an exact name match.
      * @return True if any of the items are found, false otherwise.
      */
-    public static boolean hasItem(List<String> names, boolean exact) {
+    public static boolean hasItem(Collection<String> names, boolean exact) {
         return hasItem(names, exact, 1);
     }
 
@@ -240,7 +236,7 @@ public class Rs2Bank {
      * @param amount The minimum quantity required for each item.
      * @return True if any of the items are found, false otherwise.
      */
-    public static boolean hasItem(List<String> names, int amount) {
+    public static boolean hasItem(Collection<String> names, int amount) {
         return hasItem(names, false, amount);
     }
 
@@ -252,7 +248,7 @@ public class Rs2Bank {
      * @param amount The minimum quantity required for each item.
      * @return True if all items from the list exist in the bank with the required quantity, false otherwise.
      */
-    public static boolean hasAllItems(List<String> names, boolean exact, int amount) {
+    public static boolean hasAllItems(Collection<String> names, boolean exact, int amount) {
         return names.stream().allMatch(name -> {
             Rs2ItemModel item = findBankItem(name, exact, amount);
             return item != null;
@@ -267,7 +263,7 @@ public class Rs2Bank {
      * @param amount The minimum quantity required for the items.
      * @return True if the bank contains at least one of the items with the specified quantity, false otherwise.
      */
-    public static boolean hasItem(List<String> names, boolean exact, int amount) {
+    public static boolean hasItem(Collection<String> names, boolean exact, int amount) {
         return findBankItem(names, exact, amount) != null;
     }
 
@@ -514,38 +510,24 @@ public class Rs2Bank {
         if (amount <= 0) return true;
         int selected = Microbot.getVarbitValue(VarbitID.BANK_QUANTITY_TYPE);
         int configuredX = Microbot.getVarbitValue(VarbitID.BANK_REQUESTEDQUANTITY);
-        boolean hasX = configuredX > 0;        
+        boolean hasX = configuredX > 0;
         boolean isInventory = (container == BANK_INVENTORY_ITEM_CONTAINER);
         int xSetOffset = -1;
-        int xPromptOffset = -1;
+        int xPromptOffset = isInventory ? 7 : 6;
+
         if (hasX) {
             switch (selected) {
                 case 0:
                 case 1:
                 case 2:
-                    xSetOffset = isInventory ? 6 : 4;
-                    xPromptOffset = isInventory ? 7 : 5;
+                case 4:
+					xSetOffset = isInventory ? 6 : 5;
                     break;
                 case 3:
-                    xSetOffset = isInventory ? 2 : 1;
-                    xPromptOffset = isInventory ? 7 : 5;
-                    break;
-                case 4:
-                    xSetOffset = isInventory ? 6 : 5;
-                    xPromptOffset = isInventory ? 7 : 6;
+					xSetOffset = isInventory ? 2 : 1;
                     break;
                 default:
                     throw new IllegalStateException("Unknown BANK_QUANTITY_TYPE: " + selected);
-            }
-        } else {
-            switch (selected) {
-                case 0:
-                case 1:
-                case 2:
-                    xPromptOffset = isInventory ? 7 : 4;
-                    break;
-                default:
-                    xPromptOffset = isInventory ? 7 : 5;
             }
         }
 
@@ -729,7 +711,7 @@ public class Rs2Bank {
      *
      * @return true if any items were deposited, false otherwise.
      */
-    public static boolean depositAllExcept(List<String> names) {
+    public static boolean depositAllExcept(Collection<String> names) {
         return depositAllExcept(names.toArray(String[]::new));
     }
 
@@ -1022,7 +1004,7 @@ public class Rs2Bank {
         if (Microbot.getVarbitValue(VarbitID.BANK_QUANTITY_TYPE) == 4) {
             invokeMenu(1, rs2Item);
         } else {
-            invokeMenu(6, rs2Item);
+            invokeMenu(7, rs2Item);
         }
         return true;
     }
@@ -1240,7 +1222,7 @@ public class Rs2Bank {
                 if (!Rs2GameObject.interact(nearestObj.get(), "Bank")) return false;
             } else {
                 final Rs2NpcModel banker = Rs2Npc.getBankerNPC();
-                if (!Rs2Npc.interact(banker, "Bank")) return false;
+                if (banker == null || !Rs2Npc.interact(banker, "Bank")) return false;
             }
 
             return sleepUntil(Rs2Bank::isOpen, 5_000);
@@ -1481,12 +1463,12 @@ public class Rs2Bank {
      * @return The item widget, or null if the item isn't found.
      */
     private static Rs2ItemModel findBankItem(String name, boolean exact, int amount) {
-    final String lowerCaseName = name.toLowerCase();
-    final Stream<Rs2ItemModel> items = getAll()
-            .filter(x -> exact ? x.getName().equalsIgnoreCase(lowerCaseName) : x.getName().toLowerCase().contains(lowerCaseName))
-            .filter(x -> x.getQuantity() >= amount);
-    return exact ? items.findAny().orElse(null) : items.min(Comparator.comparingInt(item -> item.getName().length())).orElse(null);
-}
+        final String lowerCaseName = name.toLowerCase();
+        final Stream<Rs2ItemModel> items = getAll()
+                .filter(x -> exact ? x.getName().equalsIgnoreCase(lowerCaseName) : x.getName().toLowerCase().contains(lowerCaseName))
+                .filter(x -> x.getQuantity() >= amount);
+        return exact ? items.findAny().orElse(null) : items.min(Comparator.comparingInt(item -> item.getName().length())).orElse(null);
+    }
 
     /**
      * Finds an item in the bank based on a list of names.
@@ -1496,7 +1478,7 @@ public class Rs2Bank {
      * @param amount The minimum amount needed to find in the bank.
      * @return The first matching item widget, or null if no matching item is found.
      */
-    private static Rs2ItemModel findBankItem(List<String> names, boolean exact, int amount) {
+    private static Rs2ItemModel findBankItem(Collection<String> names, boolean exact, int amount) {
         return getAll()
                 .filter(item -> names.stream().anyMatch(name -> exact
                         ? item.getName().equalsIgnoreCase(name)
@@ -1594,7 +1576,7 @@ public class Rs2Bank {
                 .collect(Collectors.toSet());
         long accessibleBanksTime = System.nanoTime() - accessibleBanksStart;
         log.info("\n\tAccessible banks filtering performance: \n\t{}ms, Found {} accessible banks out of {} total",
-                 accessibleBanksTime / 1_000_000.0, accessibleBanks.size(), BankLocation.values().length);
+                accessibleBanksTime / 1_000_000.0, accessibleBanks.size(), BankLocation.values().length);
 
         if (accessibleBanks.isEmpty()) {
             Microbot.log("No accessible banks found");
@@ -1620,12 +1602,12 @@ public class Rs2Bank {
         }
         // Create a WorldArea around the final tile to be more generous
         WorldPoint nearestTile = path.get(path.size() - 1);
-		WorldArea nearestTileArea = new WorldArea(nearestTile, 2, 2);
+        WorldArea nearestTileArea = new WorldArea(nearestTile, 2, 2);
         Optional<BankLocation> byPath = accessibleBanks.stream()
                 .filter(b -> {
-					WorldArea accessibleBankArea = new WorldArea(b.getWorldPoint(), 2, 2);
-					return accessibleBankArea.intersectsWith2D(nearestTileArea);
-				})
+                    WorldArea accessibleBankArea = new WorldArea(b.getWorldPoint(), 2, 2);
+                    return accessibleBankArea.intersectsWith2D(nearestTileArea);
+                })
                 .findFirst();
         BankLocation returnBankLocation = null;
         if (byPath.isPresent()) {
@@ -1795,7 +1777,7 @@ public class Rs2Bank {
      * @param e The event containing the latest bank items.
      */
     public static void updateLocalBank(ItemContainerChanged e) {
-        synchronized (lock) {            
+        synchronized (lock) {
             List<Rs2ItemModel> list = updateItemContainer(InventoryID.BANK.getId(), e);
             if (list != null) {
                 // Update the centralized bank data (Rs2BankData.set() is already synchronized)                
@@ -1969,7 +1951,7 @@ public class Rs2Bank {
             return false;
         }
 
-		synchronized(Rs2Bank.class) {
+        synchronized(Rs2Bank.class) {
             if (!isBankPinWidgetVisible()) return true;
             for (int i = 0; i < pin.length(); i++) {
                 final char c = pin.charAt(i);
@@ -1988,7 +1970,7 @@ public class Rs2Bank {
                 }
             }
             return true;
-		}
+        }
     }
 
     public static boolean handleBankPin() {
@@ -2015,7 +1997,7 @@ public class Rs2Bank {
      * @param emptySlotCount
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(Collection<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount) {
         return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, emptySlotCount, 4);
     }
 
@@ -2026,14 +2008,14 @@ public class Rs2Bank {
      * @param initialPlayerLocation
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(Collection<String> itemNames, WorldPoint initialPlayerLocation) {
         return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, 0, 4);
     }
 
     /**
      * Banks at specific bank location if your inventory does not have enough emptyslots (0 emptyslots being full). Will walk back to the initialplayerlocation passed as param
      *
-     * @param itemNames the item names
+     * @param itemNames The item names, which can be either item names or item IDs as strings.
      * @param exactItemNames
      * @param initialPlayerLocation
      * @param bankLocation
@@ -2041,12 +2023,16 @@ public class Rs2Bank {
      * @param distance
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, boolean exactItemNames, BankLocation bankLocation, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(Collection<String> itemNames, boolean exactItemNames, BankLocation bankLocation, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
         if (Rs2Inventory.emptySlotCount() <= emptySlotCount) {
             boolean isBankOpen = Rs2Bank.walkToBankAndUseBank(bankLocation);
             if (isBankOpen) {
                 for (String itemName : itemNames) {
-                    depositAll(itemName,false);
+                    if (itemName.matches("\\d+")) {
+                        depositAll(Integer.parseInt(itemName));
+                    } else {
+                        depositAll(itemName, false);
+                    }
                     //Rs2Bank.depositAll(x -> x.name.toLowerCase().contains(itemName));
                 }
             }
@@ -2075,7 +2061,7 @@ public class Rs2Bank {
      *
      * @return
      */
-    public static boolean bankItemsAndWalkBackToOriginalPosition(List<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
+    public static boolean bankItemsAndWalkBackToOriginalPosition(Collection<String> itemNames, WorldPoint initialPlayerLocation, int emptySlotCount, int distance) {
         return bankItemsAndWalkBackToOriginalPosition(itemNames,false, getNearestBank(), initialPlayerLocation, emptySlotCount, distance);
     }
 
@@ -2209,6 +2195,40 @@ public class Rs2Bank {
      */
     public static boolean emptySeedBox() {
         return empty(ItemID.SEED_BOX,ItemID.SEED_BOX_OPEN);
+    }
+
+    /**
+     * Empty log basket
+     *
+     * @return true if log basket was emptied
+     */
+    public static boolean emptyLogBasket() {
+        return empty(ItemID.LOG_BASKET_CLOSED, ItemID.LOG_BASKET_OPEN);
+    }
+
+    /**
+     * Empties the looting bag if one is present. The bank must be open.
+     *
+     * @return true if the looting bag was emptied, false otherwise.
+     */
+    public static boolean depositLootingBag(){
+        if(!Rs2Inventory.contains(ItemID.LOOTING_BAG_OPEN)) return false;
+        if(!Rs2Bank.isOpen()) return false;
+
+        //The looting bag's deposit-loot widget's ID is 983046
+        if (Rs2Inventory.interact(ItemID.LOOTING_BAG_OPEN, "View")) {
+            sleepUntil(()-> Rs2Widget.getWidget(983046) != null, Rs2Random.between(2000,5000));
+            if(Rs2Widget.getWidget(983046) != null){
+                if(Rs2Widget.clickWidget(983046)){
+                    sleepUntil(()-> Rs2Widget.getWidget(15,11).getChildren()[0] == null, Rs2Random.between(500,1000));
+                    if(Rs2Widget.clickWidget(983048)){ // close the bag
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 
