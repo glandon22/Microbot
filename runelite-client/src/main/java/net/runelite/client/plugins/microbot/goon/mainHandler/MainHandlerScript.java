@@ -3,12 +3,16 @@ package net.runelite.client.plugins.microbot.goon.mainHandler;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.goon.WT;
 import net.runelite.client.plugins.microbot.goon.accounttrainer.Farming;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
+import net.runelite.client.plugins.microbot.goon.quests.gardenOfDeath;
 import net.runelite.client.plugins.microbot.goon.statetracking.AccountState;
 import net.runelite.client.plugins.microbot.goon.statetracking.StateManager;
+import net.runelite.client.plugins.microbot.questhelper.helpers.quests.gardenoftranquility.GardenOfTranquillity;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -40,11 +44,15 @@ public class MainHandlerScript extends Script {
             long delta = now - lastLoopTime.get();
             state.updateAccumulatedTime(delta); // Only add if actively doing the activity
 
-            state.switchActivityV2();
+            try {
+                state.switchActivityV2();
+            } catch (Exception e) {
+                System.out.println("exception received:  " + e.toString());
+                System.out.println(e.getMessage());
+            }
 
             if (Objects.equals(state.currentActivity, "wintertodt")) {
                 if (state.nextActivity != null) {
-                    System.out.println("transitioning from Wintertodt.");
                     wt.activityTransition();
                     state.updateCurrentActivity();
                     System.out.println("state + " + state.nextActivity);
@@ -57,10 +65,23 @@ public class MainHandlerScript extends Script {
                     MiscellaneousUtilities.walkToGE();
                     state.updateCurrentActivity();
                 }
-                else Farming.baggedPlants();
+                else {
+                    Farming.baggedPlants();
+                    state.nextActivity = "gardenOfDeath";
+                }
             }
             else if (Objects.equals(state.currentActivity, "gardenOfDeath")) {
-                System.out.println("not implemented - garden");
+                if (state.nextActivity != null) {
+                    MiscellaneousUtilities.walkToGE();
+                    state.updateCurrentActivity();
+                }
+                else {
+                    BankHandler.withdrawQuestItems(List.of(
+                            new BankHandler.QuestItem("varrock teleport", 1, false, false, false)
+                    ), true, true);
+                    gardenOfDeath.completeQuest();
+                    state.nextActivity = "titheFarm";
+                }
             }
             else if (Objects.equals(state.currentActivity, "titheFarm")) {
                 System.out.println("not implemented - tithe");

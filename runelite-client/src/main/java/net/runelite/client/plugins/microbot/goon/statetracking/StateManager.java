@@ -21,11 +21,6 @@ public class StateManager {
         try (FileReader reader = new FileReader(file)) {
             AccountState state = GSON.fromJson(reader, AccountState.class);
             System.out.println("successfully read in state");
-            // Optional: Check for long offline reset
-            long offlineMillis = System.currentTimeMillis() - state.lastUpdateTime;
-            if (offlineMillis > 3_600_000L) { // e.g., reset if offline >1 hour
-                state.switchActivity("MAIN"); // Or handle as needed
-            }
             return state;
         } catch (IOException e) {
             System.out.println("creating a new state file for " + accountId + " after error");

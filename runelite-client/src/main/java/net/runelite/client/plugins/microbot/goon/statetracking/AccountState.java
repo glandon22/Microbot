@@ -6,11 +6,11 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import java.util.List;
 
 public class AccountState {
-    public boolean forceSave = false;
+    public boolean forceSave = true;
     public long fileSaveInterval = 60_000L;
     public long mainActivityMaxConsecutiveTime = 86_400_000L;
     public long breakActivityMaxConsecutiveTime = 14_400_000L;
-    public String currentActivity = null;
+    public String currentActivity = "wintertodt";
     private long activityStartTime = System.currentTimeMillis();
     private long accumulatedTimeMillis = 0;
     public long lastUpdateTime = System.currentTimeMillis();
@@ -73,7 +73,7 @@ public class AccountState {
         if (mainActivities.contains(currentActivity)) {
             if (accumulatedActivityRunTime < mainActivityMaxConsecutiveTime) return;
             // level farming up first to improve wintertodt loots
-            else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 20) nextActivity = "baggedPlants";
+            else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 27) nextActivity = "baggedPlants";
             else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 34) nextActivity = "gardenOfDeath";
             else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 66) nextActivity = "titheFarm";
             accumulatedActivityRunTime = 0;

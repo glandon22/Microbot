@@ -56,6 +56,7 @@ public @interface PluginDescriptor
     String Cicire = "<html>[<font color=#68ff00>Ci</font>] ";
     String ChillX = "<html>[<font color=#05e1f5>C</font>] ";
     String Gage = "<html>[<font color=#00008B>Gage</font>] ";
+	String Goon = "<html>[<font color='#F7B267'>GN</font>] ";
 	String Bradley = "<html>[<font color=#E32636>BR</font>] ";
 	String Frosty = "<html>[<font color=#00FFFF>\u2744</font>] ";
 	String Maxxin = "<html>[<font color='#8B0000'>MX</font>] ";
