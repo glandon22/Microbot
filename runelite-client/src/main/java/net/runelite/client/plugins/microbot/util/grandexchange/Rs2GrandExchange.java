@@ -1999,7 +1999,8 @@ public class Rs2GrandExchange
 					Widget itemNameWidget = offerSlot.getChild(19);
 					if (itemNameWidget == null || itemNameWidget.getText() == null) continue;
 					String geItemName = itemNameWidget.getText().toLowerCase();
-					String parsedTargetItemName = request.getItemName().substring(0, 10).toLowerCase() + "...";
+					System.out.println("probably erroring out here");
+					String parsedTargetItemName = request.getItemName().length() > 10 ? request.getItemName().substring(0, 10).toLowerCase() + "..." : request.getItemName().toLowerCase();
 					System.out.println(geItemName + " " + parsedTargetItemName + " " + request.getItemName().toLowerCase());
 					boolean doesItemMatch =
 							// Check for exact match

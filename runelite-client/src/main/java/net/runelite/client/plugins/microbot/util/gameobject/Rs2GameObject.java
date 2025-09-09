@@ -1553,6 +1553,9 @@ public class Rs2GameObject {
                     for (T obj : objs) {
                         if (obj == null) continue;
 
+                        if (obj.getWorldLocation().getX() == 1635 && obj.getWorldLocation().getY() == 3941) System.out.println("fggggg " + obj.getId());
+                            //1635, 3941,
+
                         if (obj instanceof GameObject) {
                             GameObject gameObject = (GameObject) obj;
                             if (gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {

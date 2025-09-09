@@ -9,6 +9,7 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2ObjectModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static net.runelite.client.plugins.microbot.util.Global.doUntil;
+import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class WT {
     GoonUtils goonUtils = new GoonUtils();
@@ -144,7 +146,24 @@ public class WT {
         }
     }
 
+    private void collectRewards() {
+        Rs2Walker.walkTo(1634, 3942, 0);
+        while (true) {
+            System.out.println("fff" + Rs2Player.getLocalPlayer().getInteracting());
+            if (Rs2Player.getLocalPlayer().getAnimation() == 11758) continue;
+            else if (Rs2Inventory.emptySlotCount() < 2) {
+                BankHandler.withdrawQuestItems(List.of(), true, false);
+            }
+            else {
+                System.out.println("here777 ");
+                Rs2GameObject.interact(new WorldPoint(1636, 3942, 0), "big-search");
+                sleep(1200);
+            }
+        }
+    }
+
     public AtomicLong run(AtomicLong start) {
+        //collectRewards();
         try {
             if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
                 int timeToNextGame = parseTimeToNextGame();
