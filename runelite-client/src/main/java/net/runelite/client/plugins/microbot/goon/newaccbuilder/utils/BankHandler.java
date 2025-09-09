@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 
 import lombok.Value;
+import net.runelite.client.plugins.microbot.goon.utils.GoonBank;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -20,7 +21,7 @@ public class BankHandler {
         boolean withdrawAndEquip;
     }
     public static void withdrawQuestItems(List<QuestItem> items, boolean dumpInv, boolean dumpEquip) {
-        Rs2Bank.openBank();
+        GoonBank.openBank();
         if (dumpInv) {
             Rs2Bank.depositAll();
             sleepUntil(Rs2Inventory::isEmpty);
@@ -47,8 +48,6 @@ public class BankHandler {
             }
             sleep(100);
         }
-
         Rs2Bank.closeBank();
-        System.out.println("RS2bank: " + Rs2Bank.isOpen());
     }
 }
