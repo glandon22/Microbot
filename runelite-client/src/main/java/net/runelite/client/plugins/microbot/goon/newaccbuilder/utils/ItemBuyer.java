@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 
 import lombok.Value;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.goon.utils.GoonGE;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
@@ -34,11 +35,11 @@ public class ItemBuyer {
             boolean result;
             if (item.customPrice == -1) {
                 System.out.println("buying item with defautl price");
-                result = Rs2GrandExchange.buyItemDynamic(item.name, 99, item.quantity, true, true, item.exact);
+                result = GoonGE.buyItemDynamic(item.name, 99, item.quantity, true, true, item.exact);
             }
             else {
                 System.out.println("biying item with custom price");
-                result = Rs2GrandExchange.buyItem(item.name, item.customPrice, item.quantity, true, true, item.exact);
+                result = GoonGE.buyItem(item.name, item.customPrice, item.quantity, true, true, item.exact);
             }
             if (!result) {
                 System.out.println("Failed to buy " + item.name);
