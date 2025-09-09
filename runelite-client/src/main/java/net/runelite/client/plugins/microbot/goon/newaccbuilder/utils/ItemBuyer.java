@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 
 import lombok.Value;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
@@ -12,6 +13,14 @@ import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 public class ItemBuyer {
     @Value
     public static class ItemToBuy {
+        String name;
+        int quantity;
+        int customPrice; // -1 to ignore
+        boolean exact;
+    }
+
+    @Value
+    public static class ItemToSell {
         String name;
         int quantity;
         int customPrice; // -1 to ignore
@@ -46,5 +55,15 @@ public class ItemBuyer {
         if (closeScreen) {
             Rs2Keyboard.keyPress(27);
         }
+    }
+
+    public boolean sellItems(List<ItemToSell> items){
+        Rs2GrandExchange.openExchange();
+        for (ItemToSell item : items) {
+            Microbot.log("Selling " + item.name);
+            //Rs2GrandExchange.sellItem()
+        }
+
+        return true;
     }
 }

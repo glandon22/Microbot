@@ -1,22 +1,30 @@
 package net.runelite.client.plugins.microbot.goon;
 
 import lombok.Setter;
+import net.runelite.api.ChatLineBuffer;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.GameObject;
+import net.runelite.api.MessageNode;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2ObjectModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.runelite.client.plugins.microbot.util.Global.doUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
@@ -148,8 +156,10 @@ public class WT {
 
     private void collectRewards() {
         Rs2Walker.walkTo(1634, 3942, 0);
-        while (true) {
-            System.out.println("fff" + Rs2Player.getLocalPlayer().getInteracting());
+        while (
+                parseRewards("You are owed ([\\d,]+) more rewards") == -1
+                        || parseRewards("You are owed ([\\d,]+) more rewards") > 100
+        ) {
             if (Rs2Player.getLocalPlayer().getAnimation() == 11758) continue;
             else if (Rs2Inventory.emptySlotCount() < 2) {
                 BankHandler.withdrawQuestItems(List.of(), true, false);
@@ -160,10 +170,43 @@ public class WT {
                 sleep(1200);
             }
         }
+        BankHandler.withdrawQuestItems(List.of(
+                new BankHandler.QuestItem("teleport to varrock", 1,false, false,false)
+        ), true, false);
+        MiscellaneousUtilities.walkToGE();
+        // sell all the loot hre
+    }
+
+    private int parseRewards(String regex) {
+        System.out.println("invoking");
+        final Map<Integer, ChatLineBuffer> lineBuffer = Microbot.getClient().getChatLineMap();
+        if (lineBuffer != null) {
+            System.out.println("1");
+            ChatLineBuffer gameMessages = lineBuffer.get(ChatMessageType.GAMEMESSAGE.getType());
+            if (gameMessages == null) return -1;
+            System.out.println("2");
+            final MessageNode[] lines = gameMessages.getLines().clone();
+            for (final MessageNode line : lines) {
+                if (line != null) {
+                    System.out.println("line val: " + line.getValue());
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(line.getValue());
+                    if (matcher.find()) {
+                        String numberStr = matcher.group(1); // Extract the captured number
+                        // Remove commas if present
+                        numberStr = numberStr.replace(",", "");
+                        return Integer.parseInt(numberStr);
+                    }
+                }
+            }
+
+        }
+        return -1;
     }
 
     public AtomicLong run(AtomicLong start) {
-        //collectRewards();
+        if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
+
         try {
             if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
                 int timeToNextGame = parseTimeToNextGame();
@@ -210,3 +253,5 @@ public class WT {
         Rs2Walker.walkTo(1639, 3944, 0);
     }
 }
+
+//you're now owed xxx rewards
