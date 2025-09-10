@@ -32,6 +32,7 @@ public class BankHandler {
         }
 
         for (QuestItem item : items) {
+            System.out.println("wd 1");
             if (item.noted) {
                 Rs2Bank.setWithdrawAsNote();
                 sleep(600);

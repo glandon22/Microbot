@@ -4,15 +4,19 @@ import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.grandexchange.*;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.event.Level;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -38,8 +42,8 @@ public class GoonGE {
             return false;
         }
 
-        Predicate<GrandExchangeRequest> DEFAULT_PREDICATE = gxr -> gxr.getItemName() != null && !gxr.getItemName().isBlank() && request.getQuantity() > 0;
-        Predicate<GrandExchangeRequest> PRICE_PREDICATE = gxr -> gxr.getPrice() > 0;
+        Predicate<GrandExchangeRequest> DEFAULT_PREDICATE = gxr -> gxr.getItemName() != null && !gxr.getItemName().isBlank();
+        Predicate<GrandExchangeRequest> PRICE_PREDICATE = gxr -> gxr.getPrice() > 0 || gxr.getPercent() != 0;
 
         switch (request.getAction())
         {
@@ -108,59 +112,8 @@ public class GoonGE {
                 .toBank(toBank)
                 .exact(exact)
                 .build();
-        return processOfferGoon(request);
+        return processOffer(request);
     }
-
-    /**
-     * Creates and processes a {@link GrandExchangeRequest} to buy an item on the Grand Exchange.
-     * <p>
-     * This method constructs a {@code BUY} type request using the specified item name, price, and quantity,
-     * and delegates the logic to execute the buy action.
-     *
-     * @param itemName the name of the item to buy
-     * @param price the price per item in coins
-     * @param quantity the number of items to buy
-     * @param toBank withdraw to bank or not
-     * @return {@code true} if the buy offer was successfully placed; {@code false} otherwise
-     */
-    public static boolean buyItem(String itemName, int price, int quantity, boolean toBank)
-    {
-        GrandExchangeRequest request = GrandExchangeRequest.builder()
-                .action(GrandExchangeAction.BUY)
-                .itemName(itemName)
-                .price(price)
-                .quantity(quantity)
-                .toBank(toBank)
-                .build();
-        return Rs2GrandExchange.processOffer(request);
-    }
-
-
-    /**
-     * Creates and processes a {@link GrandExchangeRequest} to buy an item on the Grand Exchange.
-     * <p>
-     * This method constructs a {@code BUY} type request using the specified item name, price, and quantity,
-     * and delegates the logic to  to execute the buy action.
-     *
-     * @param itemName the name of the item to buy
-     * @param priceAboveAsk the percent above current ask price per item in coins
-     * @param quantity the number of items to buy
-     * @return {@code true} if the buy offer was successfully placed; {@code false} otherwise
-     */
-    public static boolean buyItemDynamic(String itemName, int priceAboveAsk, int quantity, boolean buyAndCollect, boolean toBank)
-    {
-        int offerPrice = (int)(getOfferPrice() * priceAboveAsk) / 100;
-        GrandExchangeRequest request = GrandExchangeRequest.builder()
-                .action(GrandExchangeAction.BUY)
-                .itemName(itemName)
-                .price(offerPrice)
-                .quantity(quantity)
-                .buyAndCollect(buyAndCollect)
-                .toBank(toBank)
-                .build();
-        return Rs2GrandExchange.processOffer(request);
-    }
-
 
     public static boolean buyItemDynamic(String itemName, int priceAboveAsk, int quantity, boolean buyAndCollect, boolean toBank, boolean exact)
     {
@@ -173,7 +126,7 @@ public class GoonGE {
                 .toBank(toBank)
                 .exact(exact)
                 .build();
-        return processOfferGoon(request);
+        return processOffer(request);
     }
 
     private static void viewOffer(Widget widget)
@@ -188,7 +141,7 @@ public class GoonGE {
         Microbot.doInvoke(menuEntry, bounds);
     }
 
-    private static boolean collectGoonV2(GrandExchangeRequest request) {
+    private static boolean collect(GrandExchangeRequest request) {
         GrandExchangeOffer[] offers = Microbot.getClient().getGrandExchangeOffers();
 
         while (true) {
@@ -210,7 +163,15 @@ public class GoonGE {
                                     ||
                                     // Check for partial match
                                     (!request.isExact() && (geItemName.contains(parsedTargetItemName) || geItemName.contains(request.getItemName().toLowerCase())));
-
+                    System.out.println("doesit " + doesItemMatch);
+                    System.out.println(request.isExact());
+                    System.out.println(geItemName.equalsIgnoreCase(parsedTargetItemName));
+                    System.out.println(geItemName.equalsIgnoreCase(request.getItemName().toLowerCase()));
+                    System.out.println(geItemName.contains(parsedTargetItemName));
+                    System.out.println(geItemName.contains(request.getItemName().toLowerCase()));
+                    System.out.println("my ge item: " + geItemName);
+                    System.out.println(parsedTargetItemName);
+                    System.out.println(request.getItemName().toLowerCase());
                     if (!doesItemMatch) continue;
                     if (offers[i].getState() != GrandExchangeOfferState.BOUGHT) continue;
                     return collectAll(request.isToBank());
@@ -301,7 +262,7 @@ public class GoonGE {
         return Rs2Widget.isWidgetVisible(ComponentID.GRAND_EXCHANGE_OFFER_DESCRIPTION);
     }
 
-    public static boolean processOfferGoon(GrandExchangeRequest request) {
+    public static boolean processOffer(GrandExchangeRequest request) {
         if (!isValidRequest(request) || !useGrandExchange()) {
             return false;
         }
@@ -310,7 +271,7 @@ public class GoonGE {
 
         switch (request.getAction()) {
             case COLLECT:
-                success = collectGoonV2(request);
+                success = collect(request);
                 break;
 
             case BUY:
@@ -347,28 +308,21 @@ public class GoonGE {
                 );
 
                 int purchasePrice;
-                System.out.println("price: " + request.getPrice());
-                System.out.println("percent: " + request.getPercent());
                 int defaultOffer = getOfferPrice();
-                System.out.println("default offer: " + defaultOffer);
                 float offerMod = 1 + (float) request.getPercent() / 100;
-                System.out.println("offer mod: " + 1 + request.getPercent() / 100);
                 purchasePrice = request.getPrice() != 0 ? request.getPrice() : (int) (defaultOffer * offerMod);
-                System.out.println("Setting purchase price: " + purchasePrice);
                 doUntil(
                         () -> Objects.requireNonNull(Rs2Widget.getWidget(465, 26).getChild(41)).getText().contains(addCommasToNumberString(String.valueOf(purchasePrice))),
                         () -> setPrice(purchasePrice),
                         3000,
                         100000
                 );
-                System.out.println("setting purchase quantity");
                 setQuantity(request.getQuantity());
-                System.out.println("confirming");
                 confirm();
                 success = sleepUntil(() -> !isOfferScreenOpen());
                 if (request.isBuyAndCollect()) {
                     System.out.println("collecting item");
-                    success = collectGoonV2(request);
+                    success = collect(request);
                 }
                 break;
 
@@ -384,8 +338,30 @@ public class GoonGE {
                     setPrice(request.getPrice());
                 }
                 if (request.getPercent() != 0) {
-                    //adjustPriceByPercent(request.getPercent());
-                    System.out.println("need to implement this still");
+                    Widget adjustXWidget = request.getPercent() > 0
+                            ? getPricePerItemButton_PlusXPercent()
+                            : getPricePerItemButton_MinusXPercent();
+                    if (adjustXWidget == null) {
+                        Microbot.log("Failed tofind the price change button while selling " + request.getItemName(), Level.WARN);
+                        break;
+                    }
+                    int result = Rs2UiHelper.extractNumber(adjustXWidget.getText());
+                    if (result != Math.abs(request.getPercent())) {
+                        System.out.println("inside888");
+                        NewMenuEntry menuEntry = new NewMenuEntry("Customise", "", 2, MenuAction.CC_OP, request.getPercent() < 0 ? 14 : 15, adjustXWidget.getId(), false);
+                        Rectangle bounds = adjustXWidget.getBounds() != null && Rs2UiHelper.isRectangleWithinCanvas(adjustXWidget.getBounds()) ? adjustXWidget.getBounds() : Rs2UiHelper.getDefaultRectangle();
+                        Microbot.doInvoke(menuEntry, bounds);
+                        sleepUntil(() -> Rs2Widget.hasWidget("Set a percentage to decrease/increase"), 2000);
+                        Rs2Keyboard.typeString(Integer.toString(Math.abs(request.getPercent())));
+                        Rs2Keyboard.enter();
+                        sleepUntil(() -> {
+                            Widget updatedWidget = request.getPercent() > 0
+                                    ? getPricePerItemButton_PlusXPercent()
+                                    : getPricePerItemButton_MinusXPercent();
+                            return updatedWidget != null && Rs2UiHelper.extractNumber(updatedWidget.getText()) != result;
+                        }, 2000);
+                    }
+                    Rs2Widget.clickWidget(adjustXWidget);
                 }
                 if (request.getQuantity() > 0) {
                     setQuantity(request.getQuantity());
@@ -393,6 +369,10 @@ public class GoonGE {
 
                 confirm();
                 success = sleepUntil(() -> !isOfferScreenOpen());
+                if (request.isSellAndCollect()) {
+                    Microbot.log("Collecting " + request.getItemName() + " after selling.");
+                    collect(request);
+                }
                 break;
         }
 
@@ -402,6 +382,83 @@ public class GoonGE {
 
         return success;
     }
+
+    static Widget getPricePerItemButton_PlusXPercent()
+    {
+        return getOfferChild(15);
+    }
+
+    static Widget getPricePerItemButton_MinusXPercent()
+    {
+        return getOfferChild(14);
+    }
+    static Widget getItemPriceWidget()
+    {
+        return getOfferChild(41);
+    }
+    static int getItemPrice()
+    {
+        try
+        {
+            return Integer.parseInt(getItemPriceWidget().getText().replace(" coins", ""));
+        }
+        catch (NumberFormatException e)
+        {
+            Microbot.log("Invailid item price format in Grand Exchange: " + getItemPriceWidget().getText());
+            return -1;
+        }
+    }
+    static boolean hasOfferPriceChanged(int basePrice)
+    {
+        return basePrice != getItemPrice();
+    }
+
+
+    private boolean adjustPriceByPercent(int percent) {
+        int absPercent = Math.abs(percent);
+        int basePrice = Microbot.getVarbitValue(VarbitID.GE_NEWOFFER_TYPE);
+        boolean isIncrease = percent > 0;
+        Widget adjustXWidget = isIncrease
+                ? getPricePerItemButton_PlusXPercent()
+                : getPricePerItemButton_MinusXPercent();
+
+        if (adjustXWidget == null)
+        {
+            Microbot.log("Unable to find +-X% button widget.");
+            return false;
+        }
+
+        int currentPercent = Rs2UiHelper.extractNumber(adjustXWidget.getText());
+        if (currentPercent != absPercent)
+        {
+            if (currentPercent == -1)
+            {
+                Rs2Widget.clickWidget(adjustXWidget);
+            }
+            else
+            {
+//					MenuEntryImpl(getOption=Customise, getTarget=, getIdentifier=2, getType=CC_OP, getParam0=14, getParam1=30474266, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
+//					MenuEntryImpl(getOption=Customise, getTarget=, getIdentifier=2, getType=CC_OP, getParam0=15, getParam1=30474266, getItemId=-1, isForceLeftClick=false, getWorldViewId=-1, isDeprioritized=false)
+                NewMenuEntry menuEntry = new NewMenuEntry("Customise", "", 2, MenuAction.CC_OP, isIncrease ? 15 : 14, adjustXWidget.getId(), false);
+                Rectangle bounds = adjustXWidget.getBounds() != null && Rs2UiHelper.isRectangleWithinCanvas(adjustXWidget.getBounds()) ? adjustXWidget.getBounds() : Rs2UiHelper.getDefaultRectangle();
+                Microbot.doInvoke(menuEntry, bounds);
+            }
+
+            sleepUntil(() -> Rs2Widget.hasWidget("Set a percentage to decrease/increase"), 2000);
+            Rs2Keyboard.typeString(Integer.toString(absPercent));
+            Rs2Keyboard.enter();
+            sleepUntil(() -> {
+                Widget updatedWidget = isIncrease
+                        ? getPricePerItemButton_PlusXPercent()
+                        : getPricePerItemButton_MinusXPercent();
+                return updatedWidget != null && Rs2UiHelper.extractNumber(updatedWidget.getText()) != currentPercent;
+            }, 2000);
+        }
+
+        Rs2Widget.clickWidget(adjustXWidget);
+        return sleepUntil(() -> hasOfferPriceChanged(basePrice), 2000);
+    }
+
     public static String addCommasToNumberString(String number) {
         // Handle null or empty input
         if (number == null || number.isEmpty()) {

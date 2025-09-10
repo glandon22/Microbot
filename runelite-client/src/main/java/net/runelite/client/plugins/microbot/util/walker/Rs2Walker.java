@@ -291,6 +291,11 @@ public class Rs2Walker {
                 });
                 Rs2Widget.clickWidget(565, 17);
             }
+
+            //Leaving wintertodt area
+            System.out.println("runnig this " + Rs2Dialogue.hasDialogueOption("Leave and lose all progress."));
+            if (Rs2Dialogue.hasDialogueOption("Leave and lose all progress."))
+                Rs2Dialogue.clickOption("Leave and lose all progress.");
             
             // entering down ladder strong hold of security
             if (Rs2Widget.clickWidget(579, 20)) {
@@ -1599,6 +1604,7 @@ public class Rs2Walker {
     }
 
     private static void handleObject(Transport transport, TileObject tileObject) {
+        System.out.println("calling obj");
         Rs2GameObject.interact(tileObject, transport.getAction());
         if (handleObjectExceptions(transport, tileObject)) return;
         if (transport.getDestination().getPlane() == Rs2Player.getWorldLocation().getPlane()) {
@@ -1626,6 +1632,7 @@ public class Rs2Walker {
     }
 
     private static boolean handleObjectExceptions(Transport transport, TileObject tileObject) {
+        System.out.println("handle ex");
         for (Map.Entry<Integer, Integer> entry : OPEN_TO_CLOSED_MAPPINGS.entrySet()) {
             final int closedTrapdoorId = entry.getKey();
 			final int openTrapdoorId = entry.getValue();
@@ -1772,6 +1779,12 @@ public class Rs2Walker {
 			sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 10000);
 			return true;
 		}
+
+        if (tileObject.getId() == ObjectID.WINT_DOOR) {
+            Rs2Dialogue.sleepUntilSelectAnOption();
+            Rs2Dialogue.clickOption(transport.getDisplayInfo(), true);
+            sleepUntil(() -> Rs2Player.getWorldLocation().distanceTo2D(transport.getDestination()) < OFFSET, 10000);
+        }
         return false;
     }
     

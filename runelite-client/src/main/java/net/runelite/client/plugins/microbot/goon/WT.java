@@ -1,16 +1,15 @@
 package net.runelite.client.plugins.microbot.goon;
 
 import lombok.Setter;
-import net.runelite.api.ChatLineBuffer;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.GameObject;
-import net.runelite.api.MessageNode;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
+import net.runelite.client.plugins.microbot.goon.utils.GoonGE;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2ObjectModel;
@@ -20,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,6 +30,74 @@ import static net.runelite.client.plugins.microbot.util.Global.doUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class WT {
+    private static final List<String> ITEM_NAMES = List.of(
+            "Burnt page",
+            "Tome of fire (empty)",
+            "Dragon axe",
+            "Oak logs",
+            "Willow logs",
+            "Teak logs",
+            "Maple logs",
+            "Mahogany logs",
+            "Yew logs",
+            "Magic logs",
+            "Uncut sapphire",
+            "Uncut emerald",
+            "Uncut ruby",
+            "Uncut diamond",
+            "Pure essence",
+            "Limestone",
+            "Silver ore",
+            "Iron ore",
+            "Coal",
+            "Gold ore",
+            "Mithril ore",
+            "Adamantite ore",
+            "Runite ore",
+            "Grimy guam leaf",
+            "Grimy marrentill",
+            "Grimy tarromin",
+            "Grimy harralander",
+            "Grimy ranarr weed",
+            "Grimy irit leaf",
+            "Grimy avantoe",
+            "Grimy kwuarm",
+            "Grimy cadantine",
+            "Grimy lantadyme",
+            "Grimy dwarf weed",
+            "Grimy torstol",
+            "Maple seed",
+            "Mahogany seed",
+            "Yew seed",
+            "Ranarr seed",
+            "Toadflax seed",
+            "Avantoe seed",
+            "Kwuarm seed",
+            "Snapdragon seed",
+            "Cadantine seed",
+            "Dwarf weed seed",
+            "Watermelon seed",
+            "Snape grass seed",
+            "Magic seed",
+            "Torstol seed",
+            "Raw tuna",
+            "Raw lobster",
+            "Raw swordfish",
+            "Raw shark",
+            "Dynamite"
+            //"Acorn",
+            //"Willow seed",
+            //"Banana tree seed",
+            //"Teak seed",
+            //"Tarromin seed",
+            //"Harralander seed",
+            //"Irit seed",
+            //"Lantadyme seed",
+            //"Raw anchovies",
+            //"Raw trout",
+            //"Raw salmon",
+            //"Saltpetre",
+    );
     GoonUtils goonUtils = new GoonUtils();
     @Setter
     public boolean resetActions = false;
@@ -155,7 +223,7 @@ public class WT {
     }
 
     private void collectRewards() {
-        Rs2Walker.walkTo(1634, 3942, 0);
+        /*Rs2Walker.walkTo(1634, 3942, 0);
         while (
                 parseRewards("You are owed ([\\d,]+) more rewards") == -1
                         || parseRewards("You are owed ([\\d,]+) more rewards") > 100
@@ -169,26 +237,23 @@ public class WT {
                 Rs2GameObject.interact(new WorldPoint(1636, 3942, 0), "big-search");
                 sleep(1200);
             }
+            System.out.println("fake collect");
         }
         BankHandler.withdrawQuestItems(List.of(
-                new BankHandler.QuestItem("teleport to varrock", 1,false, false,false)
+                new BankHandler.QuestItem("varrock teleport", 1,false, false,false)
         ), true, false);
-        MiscellaneousUtilities.walkToGE();
-        // sell all the loot hre
+        MiscellaneousUtilities.walkToGE();*/
+        sellRewards();
     }
 
     private int parseRewards(String regex) {
-        System.out.println("invoking");
         final Map<Integer, ChatLineBuffer> lineBuffer = Microbot.getClient().getChatLineMap();
         if (lineBuffer != null) {
-            System.out.println("1");
             ChatLineBuffer gameMessages = lineBuffer.get(ChatMessageType.GAMEMESSAGE.getType());
             if (gameMessages == null) return -1;
-            System.out.println("2");
             final MessageNode[] lines = gameMessages.getLines().clone();
             for (final MessageNode line : lines) {
                 if (line != null) {
-                    System.out.println("line val: " + line.getValue());
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(line.getValue());
                     if (matcher.find()) {
@@ -205,8 +270,8 @@ public class WT {
     }
 
     public AtomicLong run(AtomicLong start) {
-        if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
-
+        //if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
+        collectRewards();
         try {
             if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
                 int timeToNextGame = parseTimeToNextGame();
@@ -251,6 +316,35 @@ public class WT {
                 100000
         );
         Rs2Walker.walkTo(1639, 3944, 0);
+    }
+
+    public static boolean sellRewards() {
+        final int INVENTORY_LIMIT = 28;
+        int startIndex = 0;
+
+        while (startIndex < ITEM_NAMES.size()) {
+            // Create a batch of up to 28 items
+            List<BankHandler.QuestItem> itemsWithdraw = new ArrayList<>();
+            List<ItemBuyer.ItemToSell> itemsSell = new ArrayList<>();
+            int endIndex = Math.min(startIndex + INVENTORY_LIMIT, ITEM_NAMES.size());
+
+            // Build the batch
+            for (int i = startIndex; i < endIndex; i++) {
+                String name = ITEM_NAMES.get(i);
+                itemsWithdraw.add(new BankHandler.QuestItem(name, 1, true, true, false));
+                itemsSell.add(new ItemBuyer.ItemToSell(name, 1, -1, -50, true, true, true, true));
+            }
+
+            // Withdraw and sell the batch
+            //BankHandler.withdrawQuestItems(itemsWithdraw, true, false);
+            ItemBuyer.sellItems(itemsSell);
+            sleep(100000);
+
+            // Move to the next batch
+            startIndex += INVENTORY_LIMIT;
+        }
+
+        return true; // Return true to indicate successful processing of all items
     }
 }
 

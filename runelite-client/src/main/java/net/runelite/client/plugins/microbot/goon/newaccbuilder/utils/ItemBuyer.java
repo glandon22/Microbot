@@ -3,6 +3,8 @@ package net.runelite.client.plugins.microbot.goon.newaccbuilder.utils;
 import lombok.Value;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.goon.utils.GoonGE;
+import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeAction;
+import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeRequest;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 
@@ -25,7 +27,11 @@ public class ItemBuyer {
         String name;
         int quantity;
         int customPrice; // -1 to ignore
+        int percentDiscount;
+        boolean sellAll;
         boolean exact;
+        boolean collectMoney;
+        boolean toBank;
     }
 
     public static boolean buyItems(List<ItemToBuy> items) {
@@ -58,11 +64,37 @@ public class ItemBuyer {
         }
     }
 
-    public boolean sellItems(List<ItemToSell> items){
-        Rs2GrandExchange.openExchange();
+    public static boolean sellItems(List<ItemToSell> items){
+        boolean res = Rs2GrandExchange.openExchange();
+        System.out.println("open: " + res);
         for (ItemToSell item : items) {
             Microbot.log("Selling " + item.name);
-            //Rs2GrandExchange.sellItem()
+            GrandExchangeRequest request;
+            if (item.customPrice != -1) {
+                request = GrandExchangeRequest.builder()
+                        .action(GrandExchangeAction.SELL)
+                        .itemName(item.name)
+                        .price(item.customPrice)
+                        .quantity(item.quantity)
+                        .toBank(item.toBank)
+                        .exact(item.exact)
+                        .sellAndCollect(item.collectMoney)
+                        .build();
+            }
+
+            else {
+                request = GrandExchangeRequest.builder()
+                        .action(GrandExchangeAction.SELL)
+                        .itemName(item.name)
+                        .percent(item.percentDiscount)
+                        .quantity(item.sellAll ? 0 : item.quantity)
+                        .toBank(item.toBank)
+                        .exact(item.exact)
+                        .sellAndCollect(item.collectMoney)
+                        .build();
+            }
+
+            GoonGE.processOffer(request);
         }
 
         return true;

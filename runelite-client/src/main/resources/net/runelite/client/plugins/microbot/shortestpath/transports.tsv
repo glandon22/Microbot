@@ -4589,8 +4589,8 @@
 2486 4471 0	3260 3171 0	Use;Fairy ring;12003								6	
 											
 # Wintertodt											
-1630 3968 0	1630 3963 0	Enter;Doors of dinh;29322								1	
-1630 3963 0	1630 3968 0	Enter;Doors of dinh;29322								1	
+1630 3968 0	1630 3963 0	Enter;Doors of dinh;29322								1	Leave and lose all progress.
+1630 3963 0	1630 3968 0	Enter;Doors of dinh;29322								1
 											
 # Camdozaal											
 2998 3494 0	2952 5762 0	Enter;Ruins Entrance;41357				Below Ice Mountain
