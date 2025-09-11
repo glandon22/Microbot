@@ -79,6 +79,7 @@ public class ItemBuyer {
                         .toBank(item.toBank)
                         .exact(item.exact)
                         .sellAndCollect(item.collectMoney)
+                        .attempts(0)
                         .build();
             }
 
@@ -91,6 +92,7 @@ public class ItemBuyer {
                         .toBank(item.toBank)
                         .exact(item.exact)
                         .sellAndCollect(item.collectMoney)
+                        .attempts(0)
                         .build();
             }
 

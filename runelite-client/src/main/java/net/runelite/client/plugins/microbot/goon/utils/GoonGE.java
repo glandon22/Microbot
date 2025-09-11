@@ -19,9 +19,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.event.Level;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,13 +43,14 @@ public class GoonGE {
 
         Predicate<GrandExchangeRequest> DEFAULT_PREDICATE = gxr -> gxr.getItemName() != null && !gxr.getItemName().isBlank();
         Predicate<GrandExchangeRequest> PRICE_PREDICATE = gxr -> gxr.getPrice() > 0 || gxr.getPercent() != 0;
+        Predicate<GrandExchangeRequest> ATTEMPTS_NOT_EXCEEDED = gxr -> gxr.getAttempts() < 3;
 
         switch (request.getAction())
         {
             case BUY:
                 return DEFAULT_PREDICATE.test(request);
             case SELL:
-                Predicate<GrandExchangeRequest> combined = DEFAULT_PREDICATE.and(PRICE_PREDICATE);
+                Predicate<GrandExchangeRequest> combined = DEFAULT_PREDICATE.and(PRICE_PREDICATE).and(ATTEMPTS_NOT_EXCEEDED);
                 return combined.test(request);
             case COLLECT:
                 return true;
@@ -142,8 +142,16 @@ public class GoonGE {
     }
 
     private static boolean collect(GrandExchangeRequest request) {
+        ArrayList<GrandExchangeOfferState> intermediateStates = new ArrayList<>(List.of(
+                GrandExchangeOfferState.SELLING,
+                GrandExchangeOfferState.BUYING
+        ));
+        ArrayList<GrandExchangeOfferState> completeStates = new ArrayList<>(List.of(
+                GrandExchangeOfferState.SOLD,
+                GrandExchangeOfferState.BOUGHT
+        ));
         GrandExchangeOffer[] offers = Microbot.getClient().getGrandExchangeOffers();
-
+        long start = System.currentTimeMillis();
         while (true) {
             GrandExchangeSlots[] slots = GrandExchangeSlots.values();
             for (int i = 0; i < slots.length; i++) {
@@ -163,17 +171,23 @@ public class GoonGE {
                                     ||
                                     // Check for partial match
                                     (!request.isExact() && (geItemName.contains(parsedTargetItemName) || geItemName.contains(request.getItemName().toLowerCase())));
-                    System.out.println("doesit " + doesItemMatch);
-                    System.out.println(request.isExact());
-                    System.out.println(geItemName.equalsIgnoreCase(parsedTargetItemName));
-                    System.out.println(geItemName.equalsIgnoreCase(request.getItemName().toLowerCase()));
-                    System.out.println(geItemName.contains(parsedTargetItemName));
-                    System.out.println(geItemName.contains(request.getItemName().toLowerCase()));
-                    System.out.println("my ge item: " + geItemName);
-                    System.out.println(parsedTargetItemName);
-                    System.out.println(request.getItemName().toLowerCase());
                     if (!doesItemMatch) continue;
-                    if (offers[i].getState() != GrandExchangeOfferState.BOUGHT) continue;
+                    GrandExchangeOfferState offerState = offers[i].getState();
+                    // offer timed out (60 seconds)
+                    if (intermediateStates.contains(offerState) && System.currentTimeMillis() - start > 60000) {
+                        Microbot.log("Timed out trying to collect " + request.getItemName(), Level.WARN);
+                        int currentPrice = Rs2UiHelper.extractNumber(Objects.requireNonNull(offerSlot.getChild(25)).getText());
+                        Rs2GrandExchange.cancelSpecificOffers(Collections.singletonList(slot), false);
+                        // Assuming 'request' is your existing GrandExchangeRequest object
+                        GrandExchangeRequest updatedRequest = request.toBuilder()
+                                .price(currentPrice) // Set the new price
+                                .attempts(request.getAttempts() + 1)
+                                .build();
+                        return processOffer(updatedRequest);
+
+                    }
+                    // offer in progress
+                    if (!completeStates.contains(offerState)) continue;
                     return collectAll(request.isToBank());
                 }
             }

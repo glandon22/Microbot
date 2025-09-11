@@ -270,8 +270,8 @@ public class WT {
     }
 
     public AtomicLong run(AtomicLong start) {
-        //if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
-        collectRewards();
+        if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
+        //collectRewards();
         try {
             if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
                 int timeToNextGame = parseTimeToNextGame();

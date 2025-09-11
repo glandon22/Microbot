@@ -12,7 +12,7 @@ import lombok.Getter;
  * and whether the offer should be closed after completion.
  */
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class GrandExchangeRequest
 {
 	/**
@@ -70,4 +70,9 @@ public class GrandExchangeRequest
 	 * Whether to collect the items directly to the bank instead of the inventory.
 	 */
 	private final boolean toBank;
+
+	/**
+	 * Number of attempts to buy or sell this item.
+	 */
+	private final int attempts;
 }
