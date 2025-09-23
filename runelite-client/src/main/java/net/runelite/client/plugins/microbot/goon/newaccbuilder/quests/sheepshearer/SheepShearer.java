@@ -1,29 +1,37 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.sheepshearer;
 
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SheepShearer {
+    final List<String> dialogue = new ArrayList<>(List.of(
+            "I'm looking for a quest.",
+            "Yes, okay. I can do that.",
+            "I need to talk to you about shearing these sheep!",
+            "Yes."
+    ));
     private void travelToQuestStart() {
         System.out.println("Headed to quest start - Sheep Shearer.");
         Rs2Walker.walkTo(new WorldPoint(3189, 3272, 0), 2);
     }
 
-    private void doDialogue() {
-        ArrayList<String> dialogue = new ArrayList<>();
-        dialogue.add( "I'm looking for a quest.");
-        dialogue.add( "Yes, okay. I can do that.");
-        dialogue.add("Yes.");
-        dialogue.add("Climb down the stairs.");
-        dialogue.add("I need to talk to you about shearing these sheep!");
-        Rs2Npc.interact("Fred the Farmer", "Talk-to");
-        DialogueHandler.handleConversation(dialogue, 15);
-        Rs2Keyboard.keyPress(27);
+    private  void prep() {
+        MiscellaneousUtilities.walkToGE();
+        BankHandler.withdrawQuestItems(
+                new ArrayList<>(List.of(
+                        new BankHandler.QuestItem("ball of wool", 20, false, false, false),
+                        new BankHandler.QuestItem("lumbridge teleport", 1, false, false, false),
+                        new BankHandler.QuestItem("varrock teleport", 1, false, false, false)
+                )), true, true
+        );
     }
 
     private boolean travelToGE() {
@@ -34,8 +42,9 @@ public class SheepShearer {
     }
 
     public void completeQuest() {
+        prep();
         travelToQuestStart();
-        doDialogue();
-        travelToGE();
+        DialogueHandler.talkToNPCCutscene("Fred the farmer", dialogue, 5);
+        MiscellaneousUtilities.waitForQuestFinish();
     }
 }

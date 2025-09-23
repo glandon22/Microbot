@@ -54,7 +54,7 @@ public class WitchesHouse {
         }
         while (true) {
             Rs2NpcModel witch = Rs2Npc.getNpc("nora t. hagg");
-            if (witch != null && witch.getWorldLocation().getX() == 2922) break;
+            if (witch != null && witch.getWorldLocation().getX() == 2919) break;
             else if (witch != null) System.out.println("Witch is visible but not in position.");
         }
         Rs2Walker.walkTo(2910, 3469, 0 , 1);
@@ -102,7 +102,10 @@ public class WitchesHouse {
                 }
             }
 
-            else Rs2GroundItem.interact(2407, "take", 10);
+            else {
+                Rs2GroundItem.interact(2407, "take", 10);
+                sleep(1000);
+            }
 
             Rs2Player.drinkPrayerPotionAt(10);
 

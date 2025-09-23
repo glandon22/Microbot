@@ -11,7 +11,9 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static net.runelite.client.plugins.microbot.util.Global.doUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class DruidicRitual {
@@ -49,13 +51,26 @@ public class DruidicRitual {
         System.out.println("Walking into cauldron room.");
         Rs2Walker.walkTo(2895, 9830, 0, 2);
         Rs2Player.drinkPrayerPotionAt(12);
-        Rs2Inventory.waitForInventoryChanges(useOnCauldron("raw chicken"), 600, 30000);
-        Rs2Player.drinkPrayerPotionAt(12);
-        Rs2Inventory.waitForInventoryChanges(useOnCauldron("raw beef"), 600, 30000);
-        Rs2Player.drinkPrayerPotionAt(12);
-        Rs2Inventory.waitForInventoryChanges(useOnCauldron("raw bear meat"), 600, 30000);
-        Rs2Player.drinkPrayerPotionAt(12);
-        Rs2Inventory.waitForInventoryChanges(useOnCauldron("raw rat meat"), 600, 30000);
+        Map<String, String> enchantedToRaw = Map.of(
+                "enchanted bear", "raw bear meat",
+                "enchanted rat", "raw rat meat",
+                "enchanted chicken", "raw chicken",
+                "enchanted beef", "raw beef"
+        );
+        for (Map.Entry<String, String> entry : enchantedToRaw.entrySet()) {
+            String enchanted = entry.getKey();
+            String raw = entry.getValue();
+            doUntil(
+                    () -> Rs2Inventory.hasItem(enchanted),
+                    () -> {
+                        Rs2Inventory.use(raw);
+                        Rs2GameObject.interact(2142, "Use");
+                    },
+                    1000,
+                    100000
+            );
+            Rs2Player.drinkPrayerPotionAt(12);
+        }
         Rs2Walker.walkTo(2883, 9830, 0, 2);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
         System.out.println("Finished enchanting meat, exiting cauldron room.");

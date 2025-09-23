@@ -134,7 +134,6 @@ public class MiscellaneousUtilities {
 
     public static void hopWorlds(int world) {
         int randomWorld = world == -1 ? Login.getRandomWorld(isMember()) : world;
-        System.out.println("dddd: " + randomWorld);
         Microbot.hopToWorld(randomWorld);
     }
 

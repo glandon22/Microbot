@@ -5,11 +5,11 @@ import net.runelite.client.plugins.microbot.goon.utils.GoonBank;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class BankHandler {
     @Value
@@ -19,6 +19,17 @@ public class BankHandler {
         boolean noted;
         boolean withdrawAll;
         boolean withdrawAndEquip;
+    }
+
+    public static boolean handlebankTutorial() {
+        GoonBank.openBank();
+        sleepUntil(() -> Rs2Widget.getWidget(664, 29) != null);
+        return doUntil(
+                () -> Rs2Widget.getWidget(664, 29) == null,
+                () -> Rs2Widget.clickWidget(664, 29),
+                3000,
+                300000
+        );
     }
     public static void withdrawQuestItems(List<QuestItem> items, boolean dumpInv, boolean dumpEquip) {
         GoonBank.openBank();
@@ -32,7 +43,6 @@ public class BankHandler {
         }
 
         for (QuestItem item : items) {
-            System.out.println("wd 1");
             if (item.noted) {
                 Rs2Bank.setWithdrawAsNote();
                 sleep(600);

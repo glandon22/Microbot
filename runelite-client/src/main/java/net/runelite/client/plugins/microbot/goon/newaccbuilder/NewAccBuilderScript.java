@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.cooksassistant.CooksAssistant;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.doricsquest.DoricsQuest;
@@ -31,7 +32,8 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLe
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.GlassBlower;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
-import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,10 +121,10 @@ public class NewAccBuilderScript extends Script {
                         new BankHandler.QuestItem("leather gloves", 1, false, false, true),
                         new BankHandler.QuestItem("cheese", 1, false, false, false),
                         new BankHandler.QuestItem("monk's robe top", 1, false, false, true),
+                        new BankHandler.QuestItem("mind rune", 600, false, false, false),
                         new BankHandler.QuestItem("monk's robe", 1, false, false, true),
+                        new BankHandler.QuestItem("earth rune", 600, false, false, false),
                         new BankHandler.QuestItem("staff of air", 1, false, false, true),
-                        new BankHandler.QuestItem("earth rune", 1000, false, false, false),
-                        new BankHandler.QuestItem("mind rune", 1000, false, false, false),
                         new BankHandler.QuestItem("falador teleport", 10, false, false, false)
                 )
         );
@@ -221,7 +223,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("redberry pie", 1, 10000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron bar", 2, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("ardougne teleport", 10, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("arrow shaft", 7000, -1, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("arrow shaft", 7000, 10, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("feather", 7000, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("guam potion (unf)", 887, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("molten glass", 1000, -1, false));
@@ -231,8 +233,8 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("saw", 1, 1000, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("tinderbox", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("plank", 1, -1, true));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pure essence", 1000, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("air tiara", 1, -1, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("pure essence", 1000, 5, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("air tiara", 1, 5000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("glassblowing pipe", 1, 1000, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("prayer potion(4)", 10, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("trout", 100, -1, true));
@@ -242,13 +244,12 @@ public class NewAccBuilderScript extends Script {
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 /*ItemBuyer.buyItems(necessaryAccountItems);
+                BankHandler.handlebankTutorial();
                 cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
                 Rs2Walker.walkTo(3293, 3379, 0);
                 Rs2Walker.walkTo(3278, 3428, 0);
                 Rs2Walker.walkTo(3164, 3483, 0);
-                itemBuyer.buyItems(necessaryAccountItems);
-                itemBuyer.ensureAllOffersCollected(true);
                 impCatcher.completeQuest();
                 witchesPotion.completeQuest();
                 Rs2Walker.walkTo(3093, 3243, 0, 2);
@@ -266,21 +267,24 @@ public class NewAccBuilderScript extends Script {
                     System.out.println("hopping out of 330");
                     MiscellaneousUtilities.hopWorlds(-1);
                 }
-                sleepUntil(() -> !Microbot.getClient().getTopLevelWorldView().getScene().isInstance());
-                Rs2Walker.walkTo(3093, 3242, 0, 3);
-                bankHandler.withdrawQuestItems(vampAndRomeoJulietItems, true, true);
+                doUntil(
+                        () -> Rs2Walker.walkTo(3093, 3242, 0, 3),
+                        () -> System.out.println("walking to draynor bank"),
+                600, 10000
+                );
+                BankHandler.withdrawQuestItems(vampAndRomeoJulietItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
                 vampireSlayer.completeQuest();
                 Rs2Walker.walkTo(3212, 3423, 0, 2);
                 romeoAndJuliet.completeQuest();
                 Rs2Walker.walkTo(3183, 3437, 0);
-                bankHandler.withdrawQuestItems(doricsAndGoblinDiploItems, true, true);
+                BankHandler.withdrawQuestItems(doricsAndGoblinDiploItems, true, true);
                 doricsQuest.completeQuest();
                 goblinDiplomacy.completeQuest();
                 Rs2Walker.walkTo(2945, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(witchesHouseAndDruidicItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
-                witchesHouse.completeQuest();
+                witchesHouse.completeQuest();*/
                 druidicRitual.completeQuest();
                 Rs2Walker.walkTo(2944, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);
@@ -309,7 +313,7 @@ public class NewAccBuilderScript extends Script {
                 TeaStallStealFletch.run();
                 PotTrainer.run();
                 GlassBlower.run();
-                MiscellaneousUtilities.levelWc();*/
+                MiscellaneousUtilities.levelWc();
                 MiscellaneousUtilities.cowMagerAndRanger();
                 MiscellaneousUtilities.getPOH();
                 MiscellaneousUtilities.makeAirRunes();
