@@ -150,13 +150,16 @@ public class NewAccBuilderScript extends Script {
                 List.of(
                         new BankHandler.QuestItem("games necklace", 1, false, false, false),
                         new BankHandler.QuestItem("necklace of passage", 1, false, false, false),
-                        new BankHandler.QuestItem("prayer potion(4)", 3, false, false, false),
+
                         new BankHandler.QuestItem("varrock teleport", 3, false, false, false),
-                        new BankHandler.QuestItem("rope", 3, false, false, false),
-                        new BankHandler.QuestItem("mind rune", 1000, false, false, false),
-                        new BankHandler.QuestItem("fire rune", 1000, false, false, false),
+                        new BankHandler.QuestItem("mind rune", 300, false, false, false),
+                        new BankHandler.QuestItem("ring of dueling", 1, false, false, true),
+                        new BankHandler.QuestItem("fire rune", 500, false, false, false),
                         new BankHandler.QuestItem("staff of air", 1, false, false, true),
-                        new BankHandler.QuestItem("ring of dueling", 1, false, false, true)
+                        new BankHandler.QuestItem("rope", 3, false, false, false),
+                        new BankHandler.QuestItem("monk's robe top", 1, false, false, true),
+                        new BankHandler.QuestItem("prayer potion(4)", 3, false, false, false),
+                        new BankHandler.QuestItem("monk's robe", 1, false, false, true)
                 )
         );
 
@@ -284,7 +287,7 @@ public class NewAccBuilderScript extends Script {
                 Rs2Walker.walkTo(2945, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(witchesHouseAndDruidicItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
-                witchesHouse.completeQuest();*/
+                witchesHouse.completeQuest();
                 druidicRitual.completeQuest();
                 Rs2Walker.walkTo(2944, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);
@@ -305,7 +308,7 @@ public class NewAccBuilderScript extends Script {
                 treeGnomeVillage.completeQuest();
                 monksFriend.completeQuest();
                 plagueCity.completeQuest();
-                Rs2Walker.walkTo(3161, 3489, 0);
+                Rs2Walker.walkTo(3161, 3489, 0);*/
                 fmLeveler.levelUp();
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();

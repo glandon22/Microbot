@@ -27,12 +27,12 @@ public class TreeGnomeVillage {
                     new BankHandler.QuestItem("necklace of passage", 1, false, false, false),
                     new BankHandler.QuestItem("prayer potion(4)", 3, false, false, false),
                     new BankHandler.QuestItem("varrock teleport", 3, false, false, false),
-                    new BankHandler.QuestItem("mind rune", 1000, false, false, false),
-                    new BankHandler.QuestItem("fire rune", 1000, false, false, false),
+                    new BankHandler.QuestItem("mind rune", 1, false, true, false),
+                    new BankHandler.QuestItem("fire rune", 1, false, true, false),
                     new BankHandler.QuestItem("staff of air", 1, false, false, true),
                     new BankHandler.QuestItem("ring of dueling", 1, false, false, false),
-                    new BankHandler.QuestItem("logs", 6, false, false, false),
                     new BankHandler.QuestItem("monk's robe top", 1, false, false, true),
+                    new BankHandler.QuestItem("logs", 6, false, false, false),
                     new BankHandler.QuestItem("monk's robe", 1, false, false, true)
             )
     );
@@ -117,6 +117,10 @@ public class TreeGnomeVillage {
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         Rs2Walker.walkTo(2457, 3297, 0, 3);
         Rs2Player.drinkPrayerPotionAt(20);
+        /**
+         * I was randomly aggro'd by a trooper here once. keep an eye out if this happens again, i could
+         * not reproduce. may need to update this to handle interruptions in the conversation.
+         */
         DialogueHandler.talkToNPC("khazard warlord", dialogue, 2);
         CombatHandler.killMonsterWithPrayer(
                 "khazard warlord", Rs2PrayerEnum.PROTECT_MELEE, 10, 5000

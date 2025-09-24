@@ -149,7 +149,7 @@ public class FmLeveler {
                 //when i level up and begin doing a new log, sometimes the old logs are still in inv. dump them
                 boolean dumpInv = Rs2Inventory.hasItem("log");
                 BankHandler.withdrawQuestItems(List.of(
-                        new BankHandler.QuestItem(logType.itemName, 27, false, false ,false)
+                        new BankHandler.QuestItem(logType.itemName, 1, false, true ,false)
                 ), dumpInv,false);
                 sleepUntil(() -> Rs2Inventory.hasItem(logType.itemId), 2000);
                 break;
@@ -158,8 +158,8 @@ public class FmLeveler {
                 debug("Banking for fire supplies");
                 BankHandler.withdrawQuestItems(List.of(
                         new BankHandler.QuestItem("tinderbox", 1, false, false ,false),
-                        new BankHandler.QuestItem(logType.itemName, 27, false, false ,false)
-                ), false,false);
+                        new BankHandler.QuestItem(logType.itemName, 1, false, true ,false)
+                ), true,false);
                 sleepUntil(() -> Rs2Inventory.hasItem(logType.itemId), 2000);
                 break;
 
@@ -197,7 +197,6 @@ public class FmLeveler {
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("tinderbox", 1, false, false ,false)
         ), true, true);
-        //this doesnt work if someone else has a campfire out
         while (Rs2Player.getRealSkillLevel(Skill.FIREMAKING) < 50) {
             logicHandler();
         }

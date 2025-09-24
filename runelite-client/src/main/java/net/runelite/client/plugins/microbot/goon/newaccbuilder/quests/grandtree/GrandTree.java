@@ -19,8 +19,7 @@ import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class GrandTree {
     List<String> dialogue = new ArrayList<>(List.of(
@@ -40,19 +39,20 @@ public class GrandTree {
         DialogueHandler.talkToNPC("king narnode shareen", dialogue, timeout);
     }
     private void glough(int timeout) {
-        Rs2Walker.walkTo(2478, 3464, 1, 2);
+        Rs2Walker.walkTo(2479, 3463, 1, 0);
         DialogueHandler.talkToNPC("glough", dialogue, timeout);
     }
 
     private void killDemon() {
         long lastSeenDemon = System.currentTimeMillis();
         System.out.println("starting");
-        while (System.currentTimeMillis() - lastSeenDemon < 10000) {
-            System.out.println("currtime " + System.currentTimeMillis() + " last seen: " + lastSeenDemon);
+        while (System.currentTimeMillis() - lastSeenDemon < 20000) {
+            //System.out.println("currtime " + System.currentTimeMillis() + " last seen: " + lastSeenDemon);
             Rs2NpcModel blackDemon = Rs2Npc.getNpc("black demon");
             if (blackDemon != null) lastSeenDemon = System.currentTimeMillis();
 
-            Rs2Player.drinkPrayerPotionAt(10);
+            Rs2Player.drinkPrayerPotionAt(15);
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
 
             if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
             else if (blackDemon != null) {
@@ -101,13 +101,16 @@ public class GrandTree {
         Rs2Walker.walkTo(2465, 3496, 3, 2);
         DialogueHandler.talkToNPC("charlie", dialogue, 5);
         Rs2Walker.walkTo(2478, 3464, 1, 2);
-        Rs2GameObject.interact("cupboard", "open");
-        sleepUntil(() -> Rs2GameObject.hasAction(Rs2GameObject.convertToObjectComposition(2434), "search"), 10000);
-        Rs2GameObject.interact("cupboard", "search");
-        Rs2Inventory.waitForInventoryChanges(5000);
-        glough(30);
-        DialogueHandler.talkToNPC("charlie", dialogue, 5);
-        DialogueHandler.talkToNPC("captain errdo", dialogue, 5);
+        doUntil(
+                () -> Rs2Inventory.hasItem("glough's journal"),
+                () -> Rs2GameObject.interact("cupboard"),
+                1200,
+                300000
+        );
+        DialogueHandler.handleConversation(List.of(), 3);
+        DialogueHandler.talkToNPCCutscene("glough", dialogue, 5);
+        DialogueHandler.talkToNPCCutscene("charlie", dialogue, 5);
+        DialogueHandler.talkToNPCCutscene("captain errdo", dialogue, 5);
         Rs2Player.drinkPrayerPotionAt(10);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         Rs2Walker.walkTo(2944, 3041, 0, 3);
@@ -150,18 +153,18 @@ public class GrandTree {
         Rs2GameObject.interact(2443, "use");
         Rs2Inventory.waitForInventoryChanges(5000);
         sleep(600);
-        Rs2Player.drinkPrayerPotionAt(10);
+        Rs2Player.drinkPrayerPotionAt(15);
         System.out.println("climbing into demon fight");
         Rs2GameObject.interact(2444, "climb-down");
         sleepUntil(Rs2Dialogue::isInDialogue, 30000);
         System.out.println("talking to glough");
-        DialogueHandler.handleConversation(dialogue, 2);
+        DialogueHandler.handleConversationWithCutscene(dialogue, 2);
         System.out.println("done talking to glough");
         sleepUntil(() -> Rs2Npc.getNpc("black demon") != null);
         System.out.println("black demon is present");
-        //2492,9865 safe spot maybe?
-        Rs2Walker.walkTo(2492,9865,0,0);
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         killDemon();
+        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
         Rs2Walker.walkTo(2467,9895,0,3);
         DialogueHandler.talkToNPC("king narnode shareen", dialogue, 25);
         searchRocks();

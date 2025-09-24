@@ -50,8 +50,6 @@ public class PlagueCity {
     }
 
     public void completeQuest() {
-        //broke somewhere in here trying to walk through east ardy, gotta check what quest stop im on
-        // couldnt figure out what broke. need to keep an eye on this one
         prep();
         Rs2Walker.walkTo(2568, 3333, 0, 3);
         DialogueHandler.talkToNPC("edmond", dialogue, 3);
@@ -82,6 +80,7 @@ public class PlagueCity {
         sleep(1200);
         Rs2GameObject.interact(2542);
         sleep(5500);
+        Rs2Walker.walkTo(2538, 3305, 0);
         DialogueHandler.talkToNPC("jethick", dialogue, 5);
         Rs2Walker.walkTo(2531, 3325, 0, 3);
         Rs2GameObject.interact(2537);
@@ -102,16 +101,15 @@ public class PlagueCity {
         Rs2GameObject.interact(2528);
         sleep(3000);
         DialogueHandler.talkToNPC("bravek", dialogue, 5);
-
         Rs2Inventory.waitForItemInInventory(() -> {
             Rs2Inventory.use("chocolate dust");
             Rs2Inventory.interact("bucket of milk", "use");
         }, "Chocolatey milk", 900, 9000);
-
         Rs2Inventory.waitForItemInInventory(() -> {
             Rs2Inventory.use("snape grass");
             Rs2Inventory.interact("Chocolatey milk", "use");
         }, "hangover cure", 900, 9000);
+        DialogueHandler.handleConversation(dialogue, 5);
         DialogueHandler.talkToNPC("bravek", dialogue, 25);
         Rs2Walker.walkTo(2540, 3275, 0);
         Rs2GameObject.interact(37321);
@@ -134,6 +132,8 @@ public class PlagueCity {
         Rs2GameObject.interact(2526);
         sleepUntil(() -> Rs2Player.getWorldLocation().getX() >= 9672);
         sleep(1200);
+        // text pops up when you open the door, handle it then talk to elenea
+        DialogueHandler.handleConversation(dialogue, 5);
         DialogueHandler.talkToNPC("elena", dialogue, 5);
         Rs2Walker.walkTo(2533, 3304,0);
         Rs2GameObject.interact(2543, "open");

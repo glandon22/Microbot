@@ -131,47 +131,28 @@ public class WaterfallQuest {
             new BankHandler.QuestItem("earth rune", 6, false, false, false),
             new BankHandler.QuestItem("trout", 6, false, false, false)
         ), true, false);
+        sleep(1200);
         dungeonLedge(false);
         Rs2GameObject.interact(2010, "open");
         sleepUntil(() -> Rs2Player.getWorldLocation().getY() > 9000, 7500);
-        Rs2Player.drinkPrayerPotionAt(10);
+        Rs2Player.drinkPrayerPotionAt(15);
         sleepUntil(Rs2Player::hasPrayerPoints);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         Rs2Walker.walkTo(2590,9883,0,3);
-        Rs2Player.drinkPrayerPotionAt(10);
+        Rs2Player.drinkPrayerPotionAt(15);
         sleepUntil(Rs2Player::hasPrayerPoints);
         Rs2GameObject.interact(1999, "search");
         Rs2Inventory.waitForInventoryChanges(5000);
-        Rs2Player.drinkPrayerPotionAt(10);
+        Rs2Player.drinkPrayerPotionAt(15);
         sleepUntil(Rs2Player::hasPrayerPoints);
         Rs2Walker.walkTo(2566,9900,0, 3);
+        Rs2Player.drinkPrayerPotionAt(15);
         Rs2GameObject.interact(2002, "open");
         sleepUntil(() -> Microbot.getClient().getTopLevelWorldView().getScene().isInstance());
         System.out.println("waiting for chamber instance to load");
         sleep(5000);
         //Rs2Walker.walkTo(2604,9909,0, 3);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
-    }
-
-    private void placeRunes() {
-        WorldPoint[] points = {
-                new WorldPoint(2562, 9910, 0),
-                new WorldPoint(2562, 9912, 0),
-                new WorldPoint(2562, 9914, 0),
-                new WorldPoint(2569, 9914, 0),
-                new WorldPoint(2569, 9912, 0),
-                new WorldPoint(2569, 9910, 0)
-        };
-
-        String[] runes = {"air rune", "earth rune", "water rune"};
-
-        for (WorldPoint point : points) {
-            for (String rune : runes) {
-                Rs2Inventory.use(rune);
-                Rs2GameObject.interact(point, "use");
-                Rs2Inventory.waitForInventoryChanges(5000);
-            }
-        }
     }
 
     private void placeRunesV2() {
@@ -192,7 +173,7 @@ public class WaterfallQuest {
             for (String rune : runes) {
                 Rs2Inventory.use(rune);
                 Rs2GameObject.interact(object, "use");
-                Rs2Inventory.waitForInventoryChanges(5000);
+                Rs2Inventory.waitForInventoryChanges(25000);
             }
         }
     }
@@ -200,12 +181,12 @@ public class WaterfallQuest {
     private void placeItems() {
         Rs2Inventory.use("glarial's amulet");
         Rs2GameObject.interact(2006, "use");
-        Rs2Inventory.waitForInventoryChanges(5000);
+        Rs2Inventory.waitForInventoryChanges(25000);
         sleepUntil(Rs2Dialogue::isInDialogue);
         DialogueHandler.handleConversation(List.of(), 5);
         Rs2Inventory.use("glarial's urn");
         Rs2GameObject.interact(2014, "use");
-        Rs2Inventory.waitForInventoryChanges(5000);
+        Rs2Inventory.waitForInventoryChanges(25000);
         sleepUntil(Rs2Dialogue::isInDialogue);
         DialogueHandler.handleConversation(List.of(), 5);
     }
