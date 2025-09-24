@@ -136,7 +136,7 @@ public class FmLeveler {
                 }
 
                 if (interacted) {
-                    sleepUntil(() -> (!Rs2Player.isMoving() && Rs2Widget.findWidget("How many would you like to burn?", null, false) != null), 5000);
+                    sleepUntil(() -> (!Rs2Player.isMoving() && Rs2Widget.findWidget("like to burn", null, false) != null), 5000);
                     sleep(180, 540);
                     Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                     expectingXPDrop = true;
