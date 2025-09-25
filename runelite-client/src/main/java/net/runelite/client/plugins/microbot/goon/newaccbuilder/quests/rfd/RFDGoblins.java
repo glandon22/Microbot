@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
@@ -36,6 +37,13 @@ public class RFDGoblins {
             new ItemBuyer.ItemToBuy("fishing bait", 1, 500, true)
     );
 
+    private static void buyKnife() {
+        Rs2Walker.walkTo(3211,3246, 0);
+        Rs2Shop.openShop("shop keeper");
+        Rs2Shop.buyItem("knife", "1");
+        Rs2Shop.closeShop();
+    }
+
     private static void prep() {
         Rs2Inventory.interact("varrock teleport", "break");
         sleep(5000);
@@ -48,17 +56,18 @@ public class RFDGoblins {
                 new BankHandler.QuestItem("falador teleport", 5, false, false, false),
                 new BankHandler.QuestItem("bread", 1, false, false, false),
                 new BankHandler.QuestItem("orange", 1, false, false, false),
-                new BankHandler.QuestItem("knife", 1, false, false, false),
                 new BankHandler.QuestItem("blue dye", 1, false, false, false),
                 new BankHandler.QuestItem("gnome spice", 1, false, false, false),
                 new BankHandler.QuestItem("bucket of water", 1, false, false, false),
                 new BankHandler.QuestItem("charcoal", 1, false, false, false),
-                new BankHandler.QuestItem("fishing bait", 1, false, false, false)
-        ), false, false);
+                new BankHandler.QuestItem("fishing bait", 1, false, false, false),
+                new BankHandler.QuestItem("coins", 10000, false, false, false)
+        ), true, true);
     }
 
     public static void completeQuest() {
-        prep();
+        /*prep();
+        buyKnife();
         Rs2Walker.walkTo(3208, 3212, 0);
         doUntil(
                 () -> Rs2Player.getWorldLocation().getY() > 5000,
@@ -103,7 +112,7 @@ public class RFDGoblins {
                 5000,
                 100000
         );
-        Microbot.log("Handling ketlle explosion cutscene.");
+        Microbot.log("Handling kettle explosion cutscene.");
         DialogueHandler.handleConversationWithCutscene(dialogue, 15);
         DialogueHandler.talkToNPC("goblin cook", dialogue, 5);
         Microbot.log("Making soggy bread.");
@@ -161,7 +170,8 @@ public class RFDGoblins {
                 3000,
                 100000
         );
-        Rs2Walker.walkTo(1861, 5325, 0);
+        sleep(1200);
+        //Rs2Walker.walkTo(1861, 5325, 0);
         doUntil(
                 () -> !Rs2Inventory.hasItem("slop of compromise"),
                 () -> {
@@ -171,10 +181,10 @@ public class RFDGoblins {
                 5000,
                 100000
         );
-        MiscellaneousUtilities.waitForQuestFinish();
+        MiscellaneousUtilities.waitForQuestFinish();*/
         doUntil(
                 () -> Rs2Player.getWorldLocation().getY() < 5000,
-                () -> Rs2GameObject.interact(12349),
+                () -> Rs2GameObject.interact(12352),
                 3000,
                 100000
         );

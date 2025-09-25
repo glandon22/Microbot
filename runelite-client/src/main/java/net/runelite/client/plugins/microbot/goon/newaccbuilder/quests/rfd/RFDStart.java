@@ -70,20 +70,22 @@ public class RFDStart {
                 2000,
                 1000000
         );
+        // a chat window pops up after making the dirty blast. handle that then talk to cook
+        DialogueHandler.handleConversation(dialogue, 5);
         DialogueHandler.talkToNPC("cook", dialogue, 5);
         MiscellaneousUtilities.waitForQuestFinish();
         DialogueHandler.handleConversation(dialogue, 5);
         doUntil(
                 Rs2Dialogue::isInCutScene,
                 () -> Rs2GameObject.interact(12348, "open"),
-                3000,
+                5000,
                 100000
         );
         DialogueHandler.handleConversationWithCutscene(dialogue, 15);
         System.out.println("Completed the long cutscene.");
         doUntil(
                 () -> Rs2Player.getWorldLocation().getY() < 5000,
-                () -> Rs2GameObject.interact(12349),
+                () -> Rs2GameObject.interact(12352),
                 3000,
                 100000
         );

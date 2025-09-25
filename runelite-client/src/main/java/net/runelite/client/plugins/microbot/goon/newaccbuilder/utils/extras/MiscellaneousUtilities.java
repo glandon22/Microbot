@@ -25,9 +25,9 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 import static net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban.WOODCUTTING_ANIMS;
+import static net.runelite.client.plugins.microbot.util.player.Rs2Player.getRs2WorldPoint;
 import static net.runelite.client.plugins.microbot.util.player.Rs2Player.isMember;
 
 public class MiscellaneousUtilities {
@@ -142,6 +142,7 @@ public class MiscellaneousUtilities {
     }
 
     public static void cowMagerAndRanger() {
+        // not tanky enough i need to bring trout TODO
         walkToGE();
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("staff of air", 1, false, false, true),
@@ -149,17 +150,35 @@ public class MiscellaneousUtilities {
                 new BankHandler.QuestItem("fire rune", 1, false, true, false),
                 new BankHandler.QuestItem("iron dart", 1, false, true, false),
                 new BankHandler.QuestItem("lumbridge teleport", 1, false, false, false),
-                new BankHandler.QuestItem("varrock teleport", 1, false, false, false)
+                new BankHandler.QuestItem("varrock teleport", 1, false, false, false),
+                new BankHandler.QuestItem("trout", 1, false, true, false)
         ), true, true);
         setSpell("fire strike");
         Rs2Walker.walkTo(3259, 3288, 0);
         while (Rs2Inventory.itemQuantity("mind rune") >= 1 && Rs2Inventory.itemQuantity("fire rune") >= 3) {
+            if (Rs2Player.getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
+                if (!Rs2Inventory.hasItem("trout")) {
+                    System.out.println("ran out of trout - exiting");
+                    return;
+                }
+                System.out.println("eating trout");
+                Rs2Inventory.interact("trout", "eat");
+            }
+
             if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
             else Rs2Npc.attack("cow");
         }
         Rs2Inventory.wield("iron dart");
         sleep(1200);
         while (Rs2Player.hasPlayerEquippedItem(Rs2Player.getLocalPlayer(), "iron dart")) {
+            if (Rs2Player.getBoostedSkillLevel(Skill.HITPOINTS) < 10) {
+                if (!Rs2Inventory.hasItem("trout")) {
+                    System.out.println("ran out of trout - exiting");
+                    return;
+                }
+                Rs2Inventory.interact("trout", "eat");
+            }
+
             if (Rs2Player.getInteracting() != null) System.out.println("Currently fighting.");
             else Rs2Npc.attack("cow");
         }
@@ -262,15 +281,31 @@ public class MiscellaneousUtilities {
                 new BankHandler.QuestItem("adamant axe", 1, false, false, true),
                 new BankHandler.QuestItem("knife", 1, false, false, false),
                 new BankHandler.QuestItem("tinderbox", 1, false, false, false),
+                new BankHandler.QuestItem("hammer", 1, false, false, false),
                 new BankHandler.QuestItem("falador teleport", 1, false, false, false)
         ), true, true);
         Rs2Walker.walkTo(3053, 3247, 0);
+        // it got stuck after arriving to kourend, so i added a bunch of variatiosn to goodbye. idk why it is broken
         List<String> dialogue = List.of(
                 "That's great, can you take me there please?",
-                "Goodbye."
+                "Goodbye.",
+                "Goodbye.",
+                "Goodbye",
+                "Goodby.",
+                "Goodby"
         );
-        DialogueHandler.talkToNPC("veos", dialogue, 15);
+        DialogueHandler.talkToNPCCutscene("veos", dialogue, 5);
+        Microbot.log("Finished travelling to kourend for the frist time.");
+        sleep(1200);
         Rs2Walker.walkTo(1634, 3938, 0);
+        doUntil(
+                () -> Rs2Player.getWorld() == 307,
+                () -> MiscellaneousUtilities.hopWorlds(307),
+                10000,
+                300000
+        );
+        sleep(10000);
+        Rs2Player.logout();
     }
 
     public static void levelWc() {

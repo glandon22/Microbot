@@ -15,8 +15,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class FightArena {
     ArrayList<BankHandler.QuestItem> items = new ArrayList<>(
@@ -24,9 +23,9 @@ public class FightArena {
                     new BankHandler.QuestItem("prayer potion", 3, false, false, false),
                     new BankHandler.QuestItem("varrock teleport", 5, false, false, false),
                     new BankHandler.QuestItem("ardougne teleport", 1, false, false, false),
-                    new BankHandler.QuestItem("mind rune", 1000, false, false, false),
+                    new BankHandler.QuestItem("mind rune", 1, false, true, false),
                     new BankHandler.QuestItem("coins", 1000, false, false, false),
-                    new BankHandler.QuestItem("fire rune", 1000, false, false, false),
+                    new BankHandler.QuestItem("fire rune", 1, false, true, false),
                     new BankHandler.QuestItem("monk's robe top", 1, false, false, true),
                     new BankHandler.QuestItem("monk's robe", 1, false, false, true),
                     new BankHandler.QuestItem("staff of air", 1, false, false, true)
@@ -47,10 +46,15 @@ public class FightArena {
         prep();
         Rs2Walker.walkTo(2565, 3201, 0);
         DialogueHandler.talkToNPC("lady servil", dialogue, 5);
-        Rs2Walker.walkTo(2611,3193,0);
-        Rs2Inventory.waitForItemInInventory(() -> {
-            Rs2GameObject.interact(75);
-        }, 74, 1200, 60000);
+        doUntil(
+                () -> Rs2Inventory.hasItem("khazard"),
+                () -> {
+                    Rs2Walker.walkTo(2613,3191,0, 0);
+                    Rs2GameObject.interact(75, "search");
+                },
+                1200,
+                300000
+        );
         Rs2Walker.walkTo(2617, 3173, 0);
         Rs2Inventory.equip(74);
         Rs2Inventory.equip(75);

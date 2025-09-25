@@ -12,8 +12,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class SeaSlug {
     ArrayList<BankHandler.QuestItem> slugItems = new ArrayList<>(
@@ -46,7 +45,7 @@ public class SeaSlug {
     public void completeQuest() {
         // got stuck in a dialogue with the sailor guy on the platform who takes you to and from
         prep();
-        Rs2Walker.walkTo(2710, 3306, 0);
+        Rs2Walker.walkTo(2716, 3306, 0);
         DialogueHandler.talkToNPC("caroline", dialogue, 5);
         DialogueHandler.talkToNPC("holgart", dialogue, 15);
         DialogueHandler.talkToNPC("holgart", dialogue, 15);
@@ -61,15 +60,24 @@ public class SeaSlug {
         Rs2Walker.walkTo(2782,3288,1, 0);
         Rs2GameObject.interact(18325, "climb-down");
         sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() == 0);
-        Rs2Walker.walkTo(2776, 3281,0);
+        Rs2Walker.walkTo(2782, 3274,0);
         DialogueHandler.talkToNPC("holgart", dialogue, 15);
+        //need to set the camera to looking north after talking to holgart bc it
+        // it gets moved somehow
         DialogueHandler.talkToNPC("kent", dialogue, 20);
         DialogueHandler.talkToNPC("holgart", dialogue, 15);
-        Rs2Walker.walkTo(2769, 3288, 0);
-        Rs2GameObject.interact(18168, "open");
-        sleep(3000);
-        Rs2GroundItem.interact(1469, "take", 8);
-        sleepUntil(() -> Rs2Inventory.hasItem(1469));
+        doUntil(
+                () -> Rs2Inventory.hasItem("broken glass"),
+                () -> {
+                    Rs2Walker.walkTo(2769, 3288, 0);
+                    Rs2GameObject.interact(18168, "open");
+                    sleepUntil(() -> Rs2GameObject.exists(11617), 5000);
+                    Rs2GroundItem.interact(1469, "take", 8);
+                    sleepUntil(() -> Rs2Inventory.hasItem(1469), 3000);
+                },
+                3000,
+                300000
+        );
         Rs2Walker.walkTo(2781, 3290, 0);
         Rs2GroundItem.interact(1467, "take", 8);
         sleepUntil(() -> Rs2Inventory.hasItem(1467));
