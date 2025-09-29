@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder;
 
 import net.runelite.client.config.*;
-import net.runelite.client.plugins.microbot.gabplugs.sandminer.GabulhasSandMinerInfo;
 
 @ConfigGroup("NewAccBuilderConfig")
 @ConfigInformation(

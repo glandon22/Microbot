@@ -8,7 +8,6 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.MicrobotOverlay;
-import net.runelite.client.plugins.microbot.prayer.GildedAltarPlayerState;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
@@ -28,6 +27,13 @@ import static net.runelite.client.plugins.microbot.util.Global.sleep;
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class PrayerLeveler {
+    public enum GildedAltarPlayerState {
+        LEAVE_HOUSE,
+        UNNOTE_BONES,
+        ENTER_HOUSE,
+        BONES_ON_ALTAR,
+        IDLE,
+    }
     public static GildedAltarPlayerState state = GildedAltarPlayerState.IDLE;
     private final int HOUSE_PORTAL_OBJECT = 4525;
     public Boolean usePortal;
