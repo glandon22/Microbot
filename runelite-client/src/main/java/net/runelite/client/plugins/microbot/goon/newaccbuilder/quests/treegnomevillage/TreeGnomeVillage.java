@@ -67,12 +67,11 @@ public class TreeGnomeVillage {
     public void completeQuest() {
         prep();
         Microbot.log("Walking to quest start.");
-        Rs2Walker.walkTo(2536, 3168, 0, 3);
+        Rs2Walker.walkTo(2501, 3192, 0, 3);
+        Rs2Walker.walkTo(2515, 3158, 0, 0);
+        Rs2Walker.walkTo(2536, 3168, 0, 2);
         DialogueHandler.talkToNPC("king bolren", dialogue, 5);
         Microbot.log("Leaving gnome maze");
-        Rs2Walker.walkTo(2515, 3158, 0, 1);
-        DialogueHandler.talkToNPC("king bolren", List.of(), 5);
-        sleepUntil(() -> Rs2Player.getWorldLocation().getY() >= 3180);
         Rs2Walker.walkTo(2524, 3210, 0, 3);
         DialogueHandler.talkToNPC("commander montai", dialogue, 5);
         DialogueHandler.talkToNPC("commander montai", dialogue, 5);

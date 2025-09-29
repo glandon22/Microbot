@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import java.io.*;
 
 public class StateManager {
-    private static final String DATA_DIR = "./bot_data/";
+    private static final String DATA_DIR = "/home/landon/bot_data/";
     private static final Gson GSON = new Gson();
 
     public static AccountState loadState(String accountId) {

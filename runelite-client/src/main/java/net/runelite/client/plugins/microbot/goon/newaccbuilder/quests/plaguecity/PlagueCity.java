@@ -14,8 +14,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class PlagueCity {
     ArrayList<BankHandler.QuestItem> items = new ArrayList<>(
@@ -50,7 +49,7 @@ public class PlagueCity {
     }
 
     public void completeQuest() {
-        prep();
+        /*prep();
         Rs2Walker.walkTo(2568, 3333, 0, 3);
         DialogueHandler.talkToNPC("edmond", dialogue, 3);
         Rs2Walker.walkTo(2575,3334,0);
@@ -89,7 +88,14 @@ public class PlagueCity {
         DialogueHandler.talkToNPC("martha rehnison", dialogue, 5);
         Rs2GameObject.interact(2539);
         sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() == 1);
-        DialogueHandler.talkToNPC("milli rehnison", dialogue, 5);
+        DialogueHandler.talkToNPC("milli rehnison", dialogue, 5);*/
+        doUntil(
+                () -> Rs2Player.getWorldLocation().getPlane() == 0,
+                () -> Rs2GameObject.interact(2540, "walk-down"),
+                3000,
+                300000
+        );
+        Rs2Walker.walkTo(2532, 3323,0, 3);
         Rs2Walker.walkTo(2540, 3275,0, 3);
         Rs2GameObject.interact(37321);
         sleepUntil(Rs2Dialogue::isInDialogue);

@@ -93,7 +93,12 @@ public class DialogueHandler {
     }
 
     public static void talkToNPCCutscene(String name, List<String> lines, int timeout) {
-        Rs2Npc.interact(name, "talk-to");
+        doUntil(
+                Rs2Dialogue::isInDialogue,
+                () -> Rs2Npc.interact(name, "talk-to"),
+                5000,
+                300000
+        );
         DialogueHandler.handleConversationWithCutscene(lines, timeout);
     }
 

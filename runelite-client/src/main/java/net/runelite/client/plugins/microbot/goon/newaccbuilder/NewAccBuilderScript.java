@@ -246,7 +246,7 @@ public class NewAccBuilderScript extends Script {
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                ItemBuyer.buyItems(necessaryAccountItems);
+                /*ItemBuyer.buyItems(necessaryAccountItems);
                 BankHandler.handlebankTutorial();
                 cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
@@ -306,7 +306,7 @@ public class NewAccBuilderScript extends Script {
                 Rs2Walker.walkTo(2465, 3489, 0, 3);
                 grandTree.completeQuest();
                 treeGnomeVillage.completeQuest();
-                monksFriend.completeQuest();
+                monksFriend.completeQuest();*/
                 plagueCity.completeQuest();
                 Rs2Walker.walkTo(3161, 3489, 0);
                 fmLeveler.levelUp();

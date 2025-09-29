@@ -32,16 +32,16 @@ public class RomeoAndJuliet {
         talkToNPC("juliet", dialogue,5 );
         Rs2Walker.walkTo(3212, 3423, 0, 2);
         talkToNPC("romeo", dialogue,5 );
-        Rs2Walker.walkTo(3248, 3479, 0, 2);
-        talkToNPC("father lawrence", dialogue,5 );
+        Rs2Walker.walkTo(3254, 3483, 0, 2);
+        DialogueHandler.talkToNPCCutscene("father lawrence", dialogue, 5);
         Rs2Walker.walkTo(3190, 3403, 0, 2);
-        talkToNPC("apothecary", dialogue,5 );
+        DialogueHandler.talkToNPCCutscene("apothecary", dialogue,5 );
         Rs2Walker.walkTo(3160, 3425, 1, 1);
         // long cutscene
-        talkToNPC("juliet", dialogue,10);
+        DialogueHandler.talkToNPCCutscene("juliet", dialogue,10);
         Rs2Walker.walkTo(3212, 3423, 0, 2);
         // long cutscene
-        talkToNPC("romeo", dialogue, 30);
+        DialogueHandler.talkToNPCCutscene("romeo", dialogue, 7);
         MiscellaneousUtilities.waitForQuestFinish();
         System.out.println("Finished romeo and juliet.");
     }

@@ -24,8 +24,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class WaterfallQuest {
     List<String> dialogue = new ArrayList<>(List.of(
@@ -141,8 +140,12 @@ public class WaterfallQuest {
         Rs2Walker.walkTo(2590,9883,0,3);
         Rs2Player.drinkPrayerPotionAt(15);
         sleepUntil(Rs2Player::hasPrayerPoints);
-        Rs2GameObject.interact(1999, "search");
-        Rs2Inventory.waitForInventoryChanges(5000);
+        doUntil(
+                () -> Rs2Inventory.hasItem(298),
+                () -> Rs2GameObject.interact(1999, "search"),
+                2000,
+                300000
+        );
         Rs2Player.drinkPrayerPotionAt(15);
         sleepUntil(Rs2Player::hasPrayerPoints);
         Rs2Walker.walkTo(2566,9900,0, 3);
@@ -184,10 +187,15 @@ public class WaterfallQuest {
         Rs2Inventory.waitForInventoryChanges(25000);
         sleepUntil(Rs2Dialogue::isInDialogue);
         DialogueHandler.handleConversation(List.of(), 5);
-        Rs2Inventory.use("glarial's urn");
-        Rs2GameObject.interact(2014, "use");
-        Rs2Inventory.waitForInventoryChanges(25000);
-        sleepUntil(Rs2Dialogue::isInDialogue);
+        doUntil(
+                Rs2Dialogue::isInDialogue,
+                () -> {
+                    Rs2Inventory.use("glarial's urn");
+                    Rs2GameObject.interact(2014, "use");
+                },
+                10000,
+                300000
+        );
         DialogueHandler.handleConversation(List.of(), 5);
     }
 
@@ -202,7 +210,6 @@ public class WaterfallQuest {
         enterChamber();
         placeRunesV2();
         placeItems();
-        DialogueHandler.handleConversation(List.of(), 5);
-        MiscellaneousUtilities.waitForQuestFinish("Waterfall Quest");
+        MiscellaneousUtilities.waitForQuestFinish();
     }
 }

@@ -103,7 +103,10 @@ public class GrandTree {
         Rs2Walker.walkTo(2478, 3464, 1, 2);
         doUntil(
                 () -> Rs2Inventory.hasItem("glough's journal"),
-                () -> Rs2GameObject.interact("cupboard"),
+                () -> {
+                    Rs2GameObject.interact(2434, "open");
+                    Rs2GameObject.interact(2435, "search");
+                },
                 1200,
                 300000
         );
@@ -156,7 +159,8 @@ public class GrandTree {
         Rs2Player.drinkPrayerPotionAt(15);
         System.out.println("climbing into demon fight");
         Rs2GameObject.interact(2444, "climb-down");
-        sleepUntil(Rs2Dialogue::isInDialogue, 30000);
+        sleepUntil(Rs2Dialogue::isInCutScene, 30000);
+        System.out.println("entered the black demon cutscene");
         System.out.println("talking to glough");
         DialogueHandler.handleConversationWithCutscene(dialogue, 2);
         System.out.println("done talking to glough");
