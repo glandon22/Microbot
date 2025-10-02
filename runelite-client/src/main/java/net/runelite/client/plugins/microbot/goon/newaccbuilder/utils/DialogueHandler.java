@@ -102,6 +102,16 @@ public class DialogueHandler {
         DialogueHandler.handleConversationWithCutscene(lines, timeout);
     }
 
+    public static void talkToNPCCutscene(int id, List<String> lines, int timeout) {
+        doUntil(
+                Rs2Dialogue::isInDialogue,
+                () -> Rs2Npc.interact(id, "talk-to"),
+                5000,
+                300000
+        );
+        DialogueHandler.handleConversationWithCutscene(lines, timeout);
+    }
+
     //last lines is to prevent selecting "goodbye" first and missing everything
     public static void selectAllDialogueOptions(String name, ArrayList<String> lastLines, int timeout) {
         Rs2Npc.interact(name, "talk-to");

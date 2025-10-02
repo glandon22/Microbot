@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.treegnomevillage;
 
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotConfig;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.CombatHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
@@ -9,6 +10,8 @@ import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.npc.Rs2NpcModel;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
@@ -17,8 +20,7 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class TreeGnomeVillage {
     ArrayList<BankHandler.QuestItem> treeGnomeItems = new ArrayList<>(
@@ -116,26 +118,57 @@ public class TreeGnomeVillage {
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
         Rs2Walker.walkTo(2457, 3297, 0, 3);
         Rs2Player.drinkPrayerPotionAt(20);
-        /**
-         * I was randomly aggro'd by a trooper here once. keep an eye out if this happens again, i could
-         * not reproduce. may need to update this to handle interruptions in the conversation.
-         */
-        DialogueHandler.talkToNPC("khazard warlord", dialogue, 2);
-        CombatHandler.killMonsterWithPrayer(
-                "khazard warlord", Rs2PrayerEnum.PROTECT_MELEE, 10, 5000
-        );
-        sleepUntil(() -> Rs2GroundItem.exists(588, 10000));
-        Rs2Inventory.waitForItemInInventory(() -> {
-            Rs2GroundItem.pickup(588);
-        }, 588, 600, 5000);
+        // i have to do all this bc sometimes a trooper aggros me and interrupts the dialogue
+        while(Rs2Npc.getNpc(7622) == null) {
+            Rs2Player.drinkPrayerPotionAt(15);
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
+            if (Rs2Player.getInteracting() != null) {
+                try {
+                    Microbot.log("Currently interacting with " + Rs2Player.getInteracting().getName());
+                } catch (Exception e) {
+                    Microbot.log("Currently interacting with unknown npc");
+                }
+            }
+
+            else {
+                Microbot.log("Attempting to start conversation with general khazard");
+                DialogueHandler.talkToNPCCutscene("khazard warlord", dialogue, 2);
+            }
+        }
+        while (!Rs2Inventory.hasItem(588)) {
+            Rs2NpcModel generalKhazard = Rs2Npc.getNpc(7622);
+            boolean orbs = Rs2GroundItem.exists(588, 5);
+            Rs2Player.drinkPrayerPotionAt(15);
+            Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
+            if (Rs2Player.getInteracting() != null) {
+                try {
+                    Microbot.log("Currently interacting with " + Rs2Player.getInteracting().getName() + " (7622)");
+                } catch (Exception e) {
+                    Microbot.log("Currently interacting with unknown npc (7622)");
+                }
+            }
+            else if (generalKhazard != null) {
+                Microbot.log("Attacking general khazard");
+                Rs2Npc.interact(generalKhazard);
+            }
+
+            if (orbs) {
+                Microbot.log("Orbs are on the ground. Picking them up");
+                Rs2GroundItem.take(588);
+            }
+        }
+        Microbot.log("Successfully retrieved orbs. Returning to king bolren.");
+        Rs2Walker.walkTo(2489, 3250, 0, 3);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
         Rs2Walker.walkTo(2501, 3192, 0, 3);
+        Microbot.log("Going to maze center via elkoy.");
         DialogueHandler.talkToNPC("elkoy", List.of("Yes please."), 5);
         sleepUntil(() -> Rs2Player.getWorldLocation().getY() <= 3177);
         sleep(1000);
+        Microbot.log("Entering gate in center of maze.");
         Rs2Walker.walkTo(2536, 3168, 0, 3);
-        DialogueHandler.talkToNPC("king bolren", dialogue, 30);
+        DialogueHandler.talkToNPCCutscene("king bolren", dialogue, 5);
         MiscellaneousUtilities.waitForQuestFinish();
-        System.out.println("completed tree gnome village");
+        Microbot.log("completed tree gnome village");
     }
 }

@@ -18,21 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MainHandlerScript extends Script {
-    /**
-     *
-     * use this as my main bot script
-     * this will determine which activity i do
-     * how do i persist state, i.e. how long i have been botting wintertodt so i know when to switch things
-     *
-     * for multi acc logging, it seems like the file here
-     * JX_CHARACTER_ID=355199433
-     * JX_SESSION_ID=2HPNDxiUj2JfBGenmXf85t
-     * JX_REFRESH_TOKEN=
-     * JX_DISPLAY_NAME=rimmer1488
-     * JX_ACCESS_TOKEN=
-     * within the same jagex account the only thing you need to change is the JX_DISPLAY_NAME. JX_SESSION_ID will be
-     * the same for each acc, as long as its under the same jagex account
-     */
     WT wt = new WT();
     public boolean run() {
         AccountState state = StateManager.loadState(Rs2Player.getLocalPlayer().getName());

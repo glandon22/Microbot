@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.knightssword;
 
+import net.runelite.api.GameObject;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
@@ -19,8 +21,9 @@ import java.awt.event.KeyEvent;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class KnightsSword {
     ArrayList<BankHandler.QuestItem> items = new ArrayList<>(
@@ -72,6 +75,17 @@ public class KnightsSword {
         Rs2Walker.walkTo(2982,3336,1);
         Rs2Walker.walkTo(2982,3339,2);
         Rs2Walker.walkTo(2984,3336,2, 0);
+        doUntil(
+                () -> Objects.equals(Rs2Player.getWorldLocation(), new WorldPoint(2984, 3335, 2)),
+                () -> {
+                    Rs2Walker.walkTo(2982,3337,2, 0);
+                    Rs2GameObject.interact(24057, "open");
+                    sleep(600);
+                    Rs2Walker.walkTo(2984, 3335, 2, 0);
+                },
+                5000,
+                500000
+        );
         while (!Rs2Inventory.hasItem("portrait")) {
             boolean isSafe = findWorldNoVyvin();
             System.out.println("issafe : " + isSafe);

@@ -29,4 +29,8 @@ public class GoonUtils {
             return start;
         }
     }
+
+    public long breakHandler() {
+        return breakHandler(System.currentTimeMillis() - 1000 * 60 * 55 * 2);
+    }
 }

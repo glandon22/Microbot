@@ -223,7 +223,7 @@ public class WT {
     }
 
     private void collectRewards() {
-        /*Rs2Walker.walkTo(1634, 3942, 0);
+        Rs2Walker.walkTo(1634, 3942, 0);
         while (
                 parseRewards("You are owed ([\\d,]+) more rewards") == -1
                         || parseRewards("You are owed ([\\d,]+) more rewards") > 100
@@ -242,7 +242,7 @@ public class WT {
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("varrock teleport", 1,false, false,false)
         ), true, false);
-        MiscellaneousUtilities.walkToGE();*/
+        MiscellaneousUtilities.walkToGE();
         sellRewards();
     }
 

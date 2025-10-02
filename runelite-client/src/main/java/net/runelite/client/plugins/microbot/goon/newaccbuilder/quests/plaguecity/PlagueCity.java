@@ -49,7 +49,7 @@ public class PlagueCity {
     }
 
     public void completeQuest() {
-        /*prep();
+        prep();
         Rs2Walker.walkTo(2568, 3333, 0, 3);
         DialogueHandler.talkToNPC("edmond", dialogue, 3);
         Rs2Walker.walkTo(2575,3334,0);
@@ -88,7 +88,7 @@ public class PlagueCity {
         DialogueHandler.talkToNPC("martha rehnison", dialogue, 5);
         Rs2GameObject.interact(2539);
         sleepUntil(() -> Rs2Player.getWorldLocation().getPlane() == 1);
-        DialogueHandler.talkToNPC("milli rehnison", dialogue, 5);*/
+        DialogueHandler.talkToNPC("milli rehnison", dialogue, 5);
         doUntil(
                 () -> Rs2Player.getWorldLocation().getPlane() == 0,
                 () -> Rs2GameObject.interact(2540, "walk-down"),
@@ -100,9 +100,8 @@ public class PlagueCity {
         Rs2GameObject.interact(37321);
         sleepUntil(Rs2Dialogue::isInDialogue);
         DialogueHandler.handleConversation(dialogue, 5);
-        Rs2Walker.walkTo(2525,3314,0);
-        Rs2Npc.interact(4255, "talk-to");
-        DialogueHandler.handleConversation(dialogue, 5);
+        Rs2Walker.walkTo(2525,3314,0,0);
+        DialogueHandler.talkToNPCCutscene(4255, dialogue, 5);
         Rs2Walker.walkTo(2529, 3314, 0, 0);
         Rs2GameObject.interact(2528);
         sleep(3000);
@@ -116,7 +115,7 @@ public class PlagueCity {
             Rs2Inventory.interact("Chocolatey milk", "use");
         }, "hangover cure", 900, 9000);
         DialogueHandler.handleConversation(dialogue, 5);
-        DialogueHandler.talkToNPC("bravek", dialogue, 25);
+        DialogueHandler.talkToNPC("bravek", dialogue, 5);
         Rs2Walker.walkTo(2540, 3275, 0);
         Rs2GameObject.interact(37321);
         sleepUntil(Rs2Dialogue::isInDialogue);

@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.goon.newaccbuilder;
 
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
+import net.runelite.client.plugins.microbot.goon.GoonUtils;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.cooksassistant.CooksAssistant;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.doricsquest.DoricsQuest;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.druidicritual.DruidicRitual;
@@ -34,12 +35,14 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.Misc
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class NewAccBuilderScript extends Script {
+    GoonUtils goonUtils = new GoonUtils();
     FmLeveler fmLeveler = new FmLeveler();
     String scriptMainTask = "Starting Script";
     String scriptSubTask = "Determining task";
@@ -230,7 +233,7 @@ public class NewAccBuilderScript extends Script {
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("feather", 7000, -1, true));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("guam potion (unf)", 887, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("molten glass", 1000, -1, false));
-        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron dart", 2000, -1, false));
+        necessaryAccountItems.add(new ItemBuyer.ItemToBuy("iron dart", 1000, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("raw sardine", 600, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("steel nails", 2000, -1, false));
         necessaryAccountItems.add(new ItemBuyer.ItemToBuy("saw", 1, 1000, true));
@@ -288,6 +291,8 @@ public class NewAccBuilderScript extends Script {
                 BankHandler.withdrawQuestItems(witchesHouseAndDruidicItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
                 witchesHouse.completeQuest();
+                // TAKE A BREAK HERE
+                goonUtils.breakHandler();
                 druidicRitual.completeQuest();
                 Rs2Walker.walkTo(2944, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);
@@ -302,25 +307,45 @@ public class NewAccBuilderScript extends Script {
                 Rs2Walker.walkTo(2461, 3379, 0, 3);
                 MiscellaneousUtilities.helpFemi();
                 Rs2Walker.walkTo(2474, 3438, 0, 3);
+                // BREAK HERE
+                goonUtils.breakHandler();
                 MiscellaneousUtilities.gnomeAgil();
+                // BREAK HERE
+                goonUtils.breakHandler();
                 Rs2Walker.walkTo(2465, 3489, 0, 3);
                 grandTree.completeQuest();
                 treeGnomeVillage.completeQuest();
-                monksFriend.completeQuest();*/
+                monksFriend.completeQuest();
                 plagueCity.completeQuest();
                 Rs2Walker.walkTo(3161, 3489, 0);
-                fmLeveler.levelUp();
+                // BREAK HERE
+                goonUtils.breakHandler();
+                fmLeveler.levelUp(41);
+                goonUtils.breakHandler();
+                fmLeveler.levelUp(50);
+                // BREAK HERE
+                goonUtils.breakHandler();*/
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();
                 fightArena.completeQuest();
+                // BREAK HERE
+                goonUtils.breakHandler();
                 TeaStallStealFletch.run();
+                // no idea how long each of these will take but need breaks while skilling
                 PotTrainer.run();
+                goonUtils.breakHandler();
                 GlassBlower.run();
+                goonUtils.breakHandler();
                 MiscellaneousUtilities.levelWc();
+                goonUtils.breakHandler();
                 MiscellaneousUtilities.cowMagerAndRanger();
+                MiscellaneousUtilities.walkToGE();
+                goonUtils.breakHandler();
                 MiscellaneousUtilities.getPOH();
                 MiscellaneousUtilities.makeAirRunes();
+                goonUtils.breakHandler();
                 MiscellaneousUtilities.sardineCooker();
+                goonUtils.breakHandler();
                 BankHandler.withdrawQuestItems(List.of(
                         new BankHandler.QuestItem("lumbridge teleport", 1, false, false, false),
                         new BankHandler.QuestItem("varrock teleport", 2, false, false, false)

@@ -193,11 +193,11 @@ public class FmLeveler {
         System.out.println(msg);
     }
 
-    public void levelUp() {
+    public void levelUp(int level) {
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("tinderbox", 1, false, false ,false)
         ), true, true);
-        while (Rs2Player.getRealSkillLevel(Skill.FIREMAKING) < 50) {
+        while (Rs2Player.getRealSkillLevel(Skill.FIREMAKING) < level) {
             logicHandler();
         }
     }

@@ -66,7 +66,7 @@ public class RFDGoblins {
     }
 
     public static void completeQuest() {
-        /*prep();
+        prep();
         buyKnife();
         Rs2Walker.walkTo(3208, 3212, 0);
         doUntil(
@@ -159,7 +159,13 @@ public class RFDGoblins {
                 5000,
                 100000
         );
-        DialogueHandler.talkToNPC("goblin cook", dialogue, 5);
+        Microbot.log("Talking to goblin cook to get slop of compromise.");
+        doUntil(
+                () -> Rs2Inventory.hasItem(7511),
+                () -> DialogueHandler.talkToNPC("goblin cook", dialogue, 5),
+                5000,
+                500000
+        );
         Rs2Inventory.interact("lumbridge teleport", "break");
         sleepUntil(() -> Rs2Player.getWorldLocation().getY() < 5000, 100000);
         sleep(3000);
@@ -181,7 +187,7 @@ public class RFDGoblins {
                 5000,
                 100000
         );
-        MiscellaneousUtilities.waitForQuestFinish();*/
+        MiscellaneousUtilities.waitForQuestFinish();
         doUntil(
                 () -> Rs2Player.getWorldLocation().getY() < 5000,
                 () -> Rs2GameObject.interact(12352),
