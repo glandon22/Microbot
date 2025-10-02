@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.druidicritual;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -13,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.runelite.client.plugins.microbot.util.Global.doUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class DruidicRitual {
     List<String> dialogue = new ArrayList<>(List.of("I'm in search of a quest.", "Okay, I will try and help.",
@@ -23,57 +23,44 @@ public class DruidicRitual {
             "Yes."
     ));
     private void kaqemeex() {
-        System.out.println("Starting druidic ritual.");
+        Microbot.log("Starting druidic ritual.");
         Rs2Walker.walkTo(2918, 3484, 0, 2);
         DialogueHandler.talkToNPC("kaqemeex", dialogue, 5);
-        System.out.println("started quest");
     }
 
     private void sanfew() {
-        System.out.println("Talking to sanfew.");
+        Microbot.log("Talking to sanfew.");
         Rs2Walker.walkTo(2895, 3428, 1, 1);
         DialogueHandler.talkToNPC("sanfew", dialogue, 5);
-        System.out.println("Finished talking to sanfew.");
-    }
-
-    private Runnable useOnCauldron(String item) {
-        return () -> {
-            System.out.println("Using " + item + " on cauldron.");
-            Rs2Inventory.use(item);
-            Rs2GameObject.interact(2142, "Use");
-        };
+        Microbot.log("Finished talking to sanfew.");
     }
 
     private void taverleyDungeon() {
-        System.out.println("Walking to cauldron entrance.");
+        ArrayList<String> meats = new ArrayList<>(List.of(
+                "raw bear meat", "raw rat meat", "raw beef", "raw chicken"
+        ));
+        Microbot.log("Walking to cauldron entrance.");
         Rs2Walker.walkTo(2883, 9830, 0, 2);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
-        System.out.println("Walking into cauldron room.");
-        Rs2Walker.walkTo(2895, 9830, 0, 2);
+        Microbot.log("Walking into cauldron room.");
+        Rs2Walker.walkTo(2895, 9830, 0, 0);
         Rs2Player.drinkPrayerPotionAt(12);
-        Map<String, String> enchantedToRaw = Map.of(
-                "enchanted bear", "raw bear meat",
-                "enchanted rat", "raw rat meat",
-                "enchanted chicken", "raw chicken",
-                "enchanted beef", "raw beef"
+        doUntilSuccess(
+                () -> Rs2Inventory.hasItem("enchanted bear") && Rs2Inventory.hasItem("enchanted rat") && Rs2Inventory.hasItem("enchanted chicken") && Rs2Inventory.hasItem("enchanted beef"),
+                () -> {
+                    for (String meat : meats) {
+                        if (Rs2Inventory.hasItem(meat)) {
+                            Rs2Inventory.use(meat);
+                            Rs2GameObject.interact(2142, "use");
+                            sleep(300);
+                        }
+                    }
+                },
+                1000
         );
-        for (Map.Entry<String, String> entry : enchantedToRaw.entrySet()) {
-            String enchanted = entry.getKey();
-            String raw = entry.getValue();
-            doUntil(
-                    () -> Rs2Inventory.hasItem(enchanted),
-                    () -> {
-                        Rs2Inventory.use(raw);
-                        Rs2GameObject.interact(2142, "Use");
-                    },
-                    1000,
-                    100000
-            );
-            Rs2Player.drinkPrayerPotionAt(12);
-        }
         Rs2Walker.walkTo(2883, 9830, 0, 2);
         Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, false);
-        System.out.println("Finished enchanting meat, exiting cauldron room.");
+        Microbot.log("Finished enchanting meat, exiting cauldron room.");
     }
 
     public void completeQuest() {
@@ -82,7 +69,7 @@ public class DruidicRitual {
         taverleyDungeon();
         sanfew();
         kaqemeex();
-        MiscellaneousUtilities.waitForQuestFinish("Druidic Ritual");
-        System.out.println("completed druidic ritual.");
+        MiscellaneousUtilities.waitForQuestFinish();
+        Microbot.log("completed druidic ritual.");
     }
 }

@@ -167,7 +167,7 @@ public class TreeGnomeVillage {
         sleep(1000);
         Microbot.log("Entering gate in center of maze.");
         Rs2Walker.walkTo(2536, 3168, 0, 3);
-        DialogueHandler.talkToNPCCutscene("king bolren", dialogue, 5);
+        DialogueHandler.talkToNPCCutscene("king bolren", dialogue, 10);
         MiscellaneousUtilities.waitForQuestFinish();
         Microbot.log("completed tree gnome village");
     }

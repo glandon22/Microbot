@@ -25,15 +25,14 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.vampiresla
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.waterfallquest.WaterfallQuest;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witcheshouse.WitchesHouse;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.quests.witchespotion.WitchesPotion;
-import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
-import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
-import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.PotTrainer;
-import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.TeaStallStealFletch;
+import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.*;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.FmLeveler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.GlassBlower;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.PrayerLeveler;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
@@ -88,10 +87,10 @@ public class NewAccBuilderScript extends Script {
                 new BankHandler.QuestItem("beer", 1, false, false, false)
         );
         vampAndRomeoJulietItems.add(
-                new BankHandler.QuestItem("mind rune", 1000, false, false, false)
+                new BankHandler.QuestItem("mind rune", 1, false, true, false)
         );
         vampAndRomeoJulietItems.add(
-                new BankHandler.QuestItem("earth rune", 1000, false, false, false)
+                new BankHandler.QuestItem("earth rune", 1, false, true, false)
         );
         vampAndRomeoJulietItems.add(
                 new BankHandler.QuestItem("varrock teleport", 10, false, false, false)
@@ -249,7 +248,7 @@ public class NewAccBuilderScript extends Script {
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                /*ItemBuyer.buyItems(necessaryAccountItems);
+                ItemBuyer.buyItems(necessaryAccountItems);
                 BankHandler.handlebankTutorial();
                 cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
@@ -324,14 +323,13 @@ public class NewAccBuilderScript extends Script {
                 goonUtils.breakHandler();
                 fmLeveler.levelUp(50);
                 // BREAK HERE
-                goonUtils.breakHandler();*/
+                goonUtils.breakHandler();
                 seaSlug.completeQuest();
                 knightsSword.completeQuest();
                 fightArena.completeQuest();
                 // BREAK HERE
                 goonUtils.breakHandler();
                 TeaStallStealFletch.run();
-                // no idea how long each of these will take but need breaks while skilling
                 PotTrainer.run();
                 goonUtils.breakHandler();
                 GlassBlower.run();
