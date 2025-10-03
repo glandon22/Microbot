@@ -27,12 +27,16 @@ public class RomeoAndJuliet {
     }
 
     public void completeQuest() {
-        /*talkToNPC("romeo", dialogue, 5);
+        talkToNPC("romeo", dialogue, 5);
         Rs2Walker.walkTo(3160, 3425, 1, 1);
         talkToNPC("juliet", dialogue,5 );
         Rs2Walker.walkTo(3212, 3423, 0, 2);
-        talkToNPC("romeo", dialogue,5 );*/
-        Rs2Walker.walkTo(3254, 3483, 0, 0);
+        talkToNPC("romeo", dialogue,5 );
+        Rs2Walker.walkTo(3254, 3484, 0, 2);
+        // the pews in the church are like a maze so getting to father lawrence occasionally takes
+        // a long time after clicking him. just give some buffer to be safe
+        Rs2Npc.interact("father lawrence", "talk-to");
+        sleep(6000);
         DialogueHandler.talkToNPCCutscene("father lawrence", dialogue, 5);
         Rs2Walker.walkTo(3190, 3403, 0, 2);
         DialogueHandler.talkToNPCCutscene("apothecary", dialogue,5 );

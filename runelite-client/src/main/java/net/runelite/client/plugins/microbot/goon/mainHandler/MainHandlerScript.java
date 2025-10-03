@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.goon.mainHandler;
 
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.goon.WT;
 import net.runelite.client.plugins.microbot.goon.accounttrainer.Farming;
@@ -10,21 +11,24 @@ import net.runelite.client.plugins.microbot.goon.statetracking.AccountState;
 import net.runelite.client.plugins.microbot.goon.statetracking.StateManager;
 import net.runelite.client.plugins.microbot.questhelper.helpers.quests.gardenoftranquility.GardenOfTranquillity;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class MainHandlerScript extends Script {
+    @Inject
+    MainHandlerConfig config;
+
     WT wt = new WT();
     public boolean run() {
         AccountState state = StateManager.loadState(Rs2Player.getLocalPlayer().getName());
         AtomicLong lastLoopTime = new AtomicLong(System.currentTimeMillis());
         AtomicLong start = new AtomicLong(System.currentTimeMillis());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            System.out.println("starting loop: " + state.nextActivity + " " + state.currentActivity);
+            Microbot.log("starting loop: " + state.nextActivity + " " + state.currentActivity);
             long now = System.currentTimeMillis();
             long delta = now - lastLoopTime.get();
             state.updateAccumulatedTime(delta); // Only add if actively doing the activity
@@ -42,7 +46,7 @@ public class MainHandlerScript extends Script {
                     state.updateCurrentActivity();
                     System.out.println("state + " + state.nextActivity);
                 }
-                else wt.run(start);
+                else wt.run(start, config);
             }
 
             else if (Objects.equals(state.currentActivity, "baggedPlants")) {

@@ -30,6 +30,7 @@ public class DruidicRitual {
 
     private void sanfew() {
         Microbot.log("Talking to sanfew.");
+        //failed to walk up the stairs here
         Rs2Walker.walkTo(2895, 3428, 1, 1);
         DialogueHandler.talkToNPC("sanfew", dialogue, 5);
         Microbot.log("Finished talking to sanfew.");

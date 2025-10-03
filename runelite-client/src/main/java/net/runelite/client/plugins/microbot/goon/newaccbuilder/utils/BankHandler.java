@@ -43,20 +43,12 @@ public class BankHandler {
         }
 
         for (QuestItem item : items) {
-            if (item.noted) {
-                Rs2Bank.setWithdrawAsNote();
-                sleep(600);
-            }
-
+            Rs2Bank.setWithdrawAs(item.noted);
             if (item.withdrawAndEquip) Rs2Bank.withdrawAndEquip(item.name);
             else if (item.withdrawAll) Rs2Bank.withdrawAll(item.name);
             else if (item.quantity == 1) Rs2Bank.withdrawOne(item.name);
             else Rs2Bank.withdrawX(item.name, item.quantity);
 
-            if (item.noted) {
-                Rs2Bank.setWithdrawAsItem();
-                sleep(600);
-            }
             sleep(100);
         }
         Rs2Bank.closeBank();

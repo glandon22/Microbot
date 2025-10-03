@@ -1,6 +1,8 @@
 package net.runelite.client.plugins.microbot.goon.mainHandler;
 
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
@@ -15,6 +17,12 @@ import java.awt.*;
 )
 @Slf4j
 public class MainHandler extends Plugin {
+    @Inject
+    MainHandlerConfig mainHandlerConfig;
+    @Provides
+    MainHandlerConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(MainHandlerConfig.class);
+    }
     @Inject
     MainHandlerScript mainHandlerScript;
     @Override

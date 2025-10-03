@@ -5,19 +5,19 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.goon.mainHandler.LootItemNames;
+import net.runelite.client.plugins.microbot.goon.mainHandler.MainHandlerConfig;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.BankHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHandler;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.ItemBuyer;
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
-import net.runelite.client.plugins.microbot.goon.utils.GoonGE;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2ObjectModel;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.misc.Rs2UiHelper;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import org.slf4j.event.Level;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,88 +30,35 @@ import static net.runelite.client.plugins.microbot.util.Global.doUntil;
 import static net.runelite.client.plugins.microbot.util.Global.sleep;
 
 public class WT {
-    private static final List<String> ITEM_NAMES = List.of(
-            "Burnt page",
-            "Tome of fire (empty)",
-            "Dragon axe",
-            "Oak logs",
-            "Willow logs",
-            "Teak logs",
-            "Maple logs",
-            "Mahogany logs",
-            "Yew logs",
-            "Magic logs",
-            "Uncut sapphire",
-            "Uncut emerald",
-            "Uncut ruby",
-            "Uncut diamond",
-            "Pure essence",
-            "Limestone",
-            "Silver ore",
-            "Iron ore",
-            "Coal",
-            "Gold ore",
-            "Mithril ore",
-            "Adamantite ore",
-            "Runite ore",
-            "Grimy guam leaf",
-            "Grimy marrentill",
-            "Grimy tarromin",
-            "Grimy harralander",
-            "Grimy ranarr weed",
-            "Grimy irit leaf",
-            "Grimy avantoe",
-            "Grimy kwuarm",
-            "Grimy cadantine",
-            "Grimy lantadyme",
-            "Grimy dwarf weed",
-            "Grimy torstol",
-            "Maple seed",
-            "Mahogany seed",
-            "Yew seed",
-            "Ranarr seed",
-            "Toadflax seed",
-            "Avantoe seed",
-            "Kwuarm seed",
-            "Snapdragon seed",
-            "Cadantine seed",
-            "Dwarf weed seed",
-            "Watermelon seed",
-            "Snape grass seed",
-            "Magic seed",
-            "Torstol seed",
-            "Raw tuna",
-            "Raw lobster",
-            "Raw swordfish",
-            "Raw shark",
-            "Dynamite"
-            //"Acorn",
-            //"Willow seed",
-            //"Banana tree seed",
-            //"Teak seed",
-            //"Tarromin seed",
-            //"Harralander seed",
-            //"Irit seed",
-            //"Lantadyme seed",
-            //"Raw anchovies",
-            //"Raw trout",
-            //"Raw salmon",
-            //"Saltpetre",
-    );
+    int MIN_WARMTH = 45;
     GoonUtils goonUtils = new GoonUtils();
     @Setter
     public boolean resetActions = false;
     private final List<Integer> expectedAnims = List.of(
             879, 877, 875, 873, 871, 869, 867, 8303, 2846, 24, 2117, 7264, 8324, 8778, 10071, 733
     );
-    private void resuppply() {
-        Rs2Walker.walkTo(1639, 3944, 0);
+
+    private static void returnToWintertodt() {
+        MiscellaneousUtilities.walkToGE();
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("knife", 1, false, false, false),
                 new BankHandler.QuestItem("hammer", 1, false, false, false),
                 new BankHandler.QuestItem("tinderbox", 1, false, false, false),
-                new BankHandler.QuestItem("cake", 4, false, false, false)
-        ), true, false);
+                new BankHandler.QuestItem("polar camo top", 1, false, false, true),
+                new BankHandler.QuestItem("polar camo legs", 1, false, false, true),
+                new BankHandler.QuestItem("fire tiara", 1, false, false, true),
+                new BankHandler.QuestItem("grey gloves", 1, false, false, true),
+                new BankHandler.QuestItem("games necklace", 1, false, false, true),
+                new BankHandler.QuestItem("adamant axe", 1, false, false, true)
+        ), true, true);
+        Rs2Walker.walkTo(1634, 3938, 0);
+        doUntil(
+                () -> Rs2Player.getWorld() == 307,
+                () -> MiscellaneousUtilities.hopWorlds(307),
+                10000,
+                300000
+        );
+        sleep(10000);
     }
 
     private int foodBites() {
@@ -126,7 +73,6 @@ public class WT {
                 && currentLocation.getX() >= 1611 && currentLocation.getX() <= 1648;
     }
     private int parseTimeToNextGame() {
-        //The Wintertodt returns in: 0:53
         Widget information = Rs2Widget.findWidget("The Wintertodt returns in:", false);
         if (information == null) return -1;
         String fullString = information.getText();
@@ -154,6 +100,7 @@ public class WT {
     }
 
     private void fletch() {
+        Microbot.log("Fletching bruma kindling.");
         long lastAnimating = System.currentTimeMillis() - 10000;
         while (Rs2Inventory.itemQuantity(item -> item.getName().toLowerCase().contains("bruma root")) > 0) {
             int wintertodtEnergy = parseEnergyAndWarmth(Rs2Widget.findWidget("wintertodt's energy"));
@@ -162,12 +109,13 @@ public class WT {
             //exit early, game almost over
             if (brumaCount > wintertodtEnergy) return;
 
-            if (playerWarmth < 35) {
-                Rs2Inventory.interact(new String[]{"cake", "slice of cake", "2/3 cake"}, "eat");
+            if (playerWarmth < MIN_WARMTH) {
+                increasePlayerWarmth();
                 resetActions = true;
             }
             else if (Rs2Player.getAnimation() == 1248) lastAnimating = System.currentTimeMillis();
             else if (resetActions || System.currentTimeMillis() - lastAnimating > 2000) {
+                Microbot.log("Timed out fletching. Click knife and logs again.");
                 Rs2Inventory.interact("knife", "use");
                 Rs2Inventory.interact("bruma root", "use");
                 resetActions = false;
@@ -177,41 +125,39 @@ public class WT {
     }
 
     private void loadBrazier() {
-        System.out.println("fletching");
         fletch();
-        System.out.println("done fletching. total kindling count: " + Rs2Inventory.itemQuantity(item -> item.getName().toLowerCase().contains("bruma kindling   ")));
-        System.out.println("loading brazier.");
+        Microbot.log("Done fletching, loading brazier.");
         long lastAnimating = System.currentTimeMillis() - 10000;
         while (Rs2Inventory.hasItem("bruma")) {
             GameObject litBrazier = Rs2GameObject.getGameObject(29314, new WorldPoint(1621, 3998, 0), true);
             GameObject unlitBrazier = Rs2GameObject.getGameObject(29312, new WorldPoint(1621, 3998, 0), true);
             GameObject brokenBrazier = Rs2GameObject.getGameObject(29313, new WorldPoint(1621, 3998, 0), true);
             int playerWarmth = parseEnergyAndWarmth(Rs2Widget.findWidget("your warmth"));
-            if (playerWarmth < 35) {
-                Rs2Inventory.interact(new String[]{"cake", "slice of cake", "2/3 cake"}, "eat");
+            if (playerWarmth < MIN_WARMTH) {
+                increasePlayerWarmth();
                 resetActions = true;
             }
 
             // can refine this if i want. just exits loading if im going to get hit by snow attack
             if (Rs2GameObject.getGameObject(26690, Rs2Player.getWorldLocation(), true) != null) {
-                System.out.println("incoming falling snow - exiting");
+                Microbot.log("incoming falling snow - exiting");
                 return;
             }
             else if (Rs2Player.getAnimation() == 832) {
                 lastAnimating = System.currentTimeMillis();
-                System.out.println("currently loading brazier");
+                Microbot.log("currently loading brazier");
             }
             else if (brokenBrazier != null) {
                 Rs2GameObject.interact(brokenBrazier, "fix");
-                System.out.println("fixing broken brazier");
+                Microbot.log("fixing broken brazier");
             }
             else if (unlitBrazier != null) {
                 Rs2GameObject.interact(unlitBrazier, "light");
-                System.out.println("lighting extinguished brazier");
+                Microbot.log("lighting extinguished brazier");
             }
             else if (litBrazier != null) {
                 if (System.currentTimeMillis() - lastAnimating > 2000 || resetActions) {
-                    System.out.println("too long without loading - click brazier again");
+                    Microbot.log("too long without loading - click brazier again");
                     Rs2GameObject.interact(litBrazier, "feed");
                     lastAnimating = System.currentTimeMillis();
                     resetActions = false;
@@ -233,11 +179,9 @@ public class WT {
                 BankHandler.withdrawQuestItems(List.of(), true, false);
             }
             else {
-                System.out.println("here777 ");
                 Rs2GameObject.interact(new WorldPoint(1636, 3942, 0), "big-search");
                 sleep(1200);
             }
-            System.out.println("fake collect");
         }
         BankHandler.withdrawQuestItems(List.of(
                 new BankHandler.QuestItem("varrock teleport", 1,false, false,false)
@@ -269,41 +213,6 @@ public class WT {
         return -1;
     }
 
-    public AtomicLong run(AtomicLong start) {
-        if (parseRewards("You're now owed (\\d+) rewards\\.$") > 5000) collectRewards();
-        //collectRewards();
-        try {
-            if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
-                int timeToNextGame = parseTimeToNextGame();
-                if (foodBites() < 6) resuppply();
-                else if (!inArena()) Rs2Walker.walkTo(1629, 3982, 0);
-                else if (timeToNextGame > 0) Rs2Walker.walkTo(1621, 3996, 0, 0);
-                else if (timeToNextGame == 0) Rs2GameObject.interact(29312);
-
-                start.set(goonUtils.breakHandler(start.get()));
-            }
-
-            else {
-                int wintertodtEnergy = parseEnergyAndWarmth(Rs2Widget.findWidget("wintertodt's energy"));
-                int playerWarmth = parseEnergyAndWarmth(Rs2Widget.findWidget("your warmth"));
-                int brumaCount = Rs2Inventory.itemQuantity(item -> item.getName().toLowerCase().contains("bruma"));
-                if (playerWarmth < 35) Rs2Inventory.interact(new String[]{"cake", "slice of cake", "2/3 cake"}, "eat");
-                else if (Rs2Inventory.isFull() || brumaCount * 2 >= wintertodtEnergy) loadBrazier();
-                else if (!expectedAnims.contains(Rs2Player.getAnimation())){
-                    Rs2Walker.walkTo(1622, 3988, 0, 0);
-                    Rs2GameObject.interact(29311);
-                }
-            }
-
-            return start;
-
-        } catch (Exception e) {
-            System.err.println("Error in wintertodt task: " + e.getMessage());
-            e.printStackTrace();
-            return start;
-        }
-    }
-
     public void activityTransition() {
         Rs2Walker.walkTo(1630, 3968, 0);
         doUntil(
@@ -319,33 +228,135 @@ public class WT {
     }
 
     public static boolean sellRewards() {
+        Microbot.log("Sellings rewards from wintertodt.");
         final int INVENTORY_LIMIT = 28;
         int startIndex = 0;
 
-        while (startIndex < ITEM_NAMES.size()) {
+        while (startIndex < LootItemNames.LOOT_ITEM_NAMES.size()) {
             // Create a batch of up to 28 items
             List<BankHandler.QuestItem> itemsWithdraw = new ArrayList<>();
             List<ItemBuyer.ItemToSell> itemsSell = new ArrayList<>();
-            int endIndex = Math.min(startIndex + INVENTORY_LIMIT, ITEM_NAMES.size());
+            int endIndex = Math.min(startIndex + INVENTORY_LIMIT, LootItemNames.LOOT_ITEM_NAMES.size());
 
             // Build the batch
             for (int i = startIndex; i < endIndex; i++) {
-                String name = ITEM_NAMES.get(i);
+                String name = LootItemNames.LOOT_ITEM_NAMES.get(i);
+                Microbot.log("Adding " + name + " to current sales batch.");
                 itemsWithdraw.add(new BankHandler.QuestItem(name, 1, true, true, false));
                 itemsSell.add(new ItemBuyer.ItemToSell(name, 1, -1, -50, true, true, true, true));
             }
 
             // Withdraw and sell the batch
-            //BankHandler.withdrawQuestItems(itemsWithdraw, true, false);
+            Microbot.log("Withdrawing all batch items to sell.");
+            BankHandler.withdrawQuestItems(itemsWithdraw, true, false);
+            Microbot.log("Starting to sell batch items.");
             ItemBuyer.sellItems(itemsSell);
-            sleep(100000);
+            Microbot.log("Done selling items.");
 
             // Move to the next batch
             startIndex += INVENTORY_LIMIT;
         }
-
+        returnToWintertodt();
         return true; // Return true to indicate successful processing of all items
     }
-}
 
-//you're now owed xxx rewards
+    private void makeRejuvPots() {
+        doUntil(
+                () -> Rs2Inventory.hasItem("rejuvenation potion (4)"),
+                () -> {
+                    Microbot.log("Walking to bruma root to make rejuv pots.");
+                    Rs2Walker.walkTo(1611, 4007, 0);
+                    Microbot.log("Picking bruma herbs.");
+                    boolean pickedHerbs = doUntil(
+                            () -> Rs2Inventory.itemQuantity("bruma herb") >= 1,
+                            () -> {
+                                if (Rs2Player.getLocalPlayer().getAnimation() != 2282) Rs2GameObject.interact(29315, "pick");
+                            },
+                            1200,
+                            100000
+                    );
+                    if (!pickedHerbs) {
+                        Microbot.log("Failed to pick bruma herbs.", Level.WARN);
+                        return;
+                    }
+                    Rs2Walker.walkTo(1627, 3988, 0);
+                    boolean gotUnfs = doUntil(
+                            () -> Rs2Inventory.itemQuantity("rejuvenation potion (unf)") >= 1,
+                            () -> Rs2GameObject.interact(29320),
+                            1200,
+                            100000
+                    );
+                    if (!gotUnfs) {
+                        Microbot.log("Failed to get unfinished pots.", Level.WARN);
+                        return;
+                    }
+                    boolean usedSupps = doUntil(
+                            () -> !Rs2Inventory.hasItem("rejuvenation potion (unf)") || !Rs2Inventory.hasItem("bruma herb"),
+                            () -> {
+                                Rs2Inventory.interact("rejuvenation potion (unf)", "use");
+                                Rs2Inventory.interact("bruma herb", "use");
+                            },
+                            1000,
+                            50000
+                    );
+                    if (!usedSupps) {
+                        Microbot.log("Failed to use all pot supplies.", Level.WARN);
+                        sleep(600);
+                    }
+                },
+                1000,
+                500000
+        );
+    }
+
+    private void increasePlayerWarmth() {
+        Microbot.log("Warmth low - drinking pot.");
+        for (String pot : List.of(
+                "rejuvenation potion (1)", "rejuvenation potion (2)", "rejuvenation potion (3)", "rejuvenation potion (4)"
+        )) {
+            if (Rs2Inventory.hasItem(pot)) {
+                Rs2Inventory.interact(pot, "drink");
+                sleep(200);
+            }
+        }
+
+        Microbot.log("Warmth is low and out of pots - making more.");
+        makeRejuvPots();
+    }
+
+    public AtomicLong run(AtomicLong start, MainHandlerConfig config) {
+        Microbot.log("Current rewards threshold: " + config.rewardCollectionThresholdWT());
+        if (parseRewards("You're now owed (\\d+) rewards\\.$") > config.rewardCollectionThresholdWT()) collectRewards();
+
+        try {
+            if (!Rs2Widget.hasWidget("Wintertodt's Energy")) {
+                int timeToNextGame = parseTimeToNextGame();
+                if (!Rs2Inventory.hasItem("rejuvenation potion (4)")) makeRejuvPots();
+                else if (!inArena()) Rs2Walker.walkTo(1629, 3982, 0);
+                else if (timeToNextGame > 0) Rs2Walker.walkTo(1621, 3996, 0, 0);
+                else if (timeToNextGame == 0) Rs2GameObject.interact(29312);
+
+                start.set(goonUtils.breakHandler(start.get()));
+            }
+
+            else {
+                int wintertodtEnergy = parseEnergyAndWarmth(Rs2Widget.findWidget("wintertodt's energy"));
+                int playerWarmth = parseEnergyAndWarmth(Rs2Widget.findWidget("your warmth"));
+                int brumaCount = Rs2Inventory.itemQuantity(item -> item.getName().toLowerCase().contains("bruma"));
+                if (playerWarmth < MIN_WARMTH) increasePlayerWarmth();
+                else if (Rs2Inventory.isFull() || brumaCount * 2 >= wintertodtEnergy) loadBrazier();
+                else if (!expectedAnims.contains(Rs2Player.getAnimation())){
+                    Rs2Walker.walkTo(1622, 3988, 0, 0);
+                    Rs2GameObject.interact(29311);
+                }
+            }
+
+            return start;
+
+        } catch (Exception e) {
+            System.err.println("Error in wintertodt task: " + e.getMessage());
+            e.printStackTrace();
+            return start;
+        }
+    }
+}

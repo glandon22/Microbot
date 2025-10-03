@@ -8,17 +8,19 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.logging.Level;
 
 import static net.runelite.client.plugins.microbot.util.Global.sleepUntil;
 
 public class GoonUtils {
+    Random rand = new Random();
     public long breakHandler(long start) {
         LocalDateTime now = LocalDateTime.now();
         int hour = now.getHour();
         DayOfWeek day = now.getDayOfWeek();
 
-        if (System.currentTimeMillis() - start > 1000 * 60 * 55) {
+        if (System.currentTimeMillis() - start > 1000 * 60 * (rand.nextInt(57 - 55 + 1) + 55)) {
             Rs2Player.logout();
             Microbot.log("Logged out for regular break");
             // Check if it's Monday through Thursday and between 9 PM and 5 AM

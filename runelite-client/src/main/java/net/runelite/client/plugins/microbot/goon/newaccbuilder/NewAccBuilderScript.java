@@ -280,7 +280,7 @@ public class NewAccBuilderScript extends Script {
                 BankHandler.withdrawQuestItems(vampAndRomeoJulietItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
                 vampireSlayer.completeQuest();
-                Rs2Walker.walkTo(3212, 3423, 0, 2);*/
+                Rs2Walker.walkTo(3212, 3423, 0, 2);
                 romeoAndJuliet.completeQuest();
                 Rs2Walker.walkTo(3183, 3437, 0);
                 BankHandler.withdrawQuestItems(doricsAndGoblinDiploItems, true, true);
@@ -291,7 +291,7 @@ public class NewAccBuilderScript extends Script {
                 MiscellaneousUtilities.setSpell("earth strike");
                 witchesHouse.completeQuest();
                 // TAKE A BREAK HERE
-                goonUtils.breakHandler();
+                goonUtils.breakHandler();*/
                 druidicRitual.completeQuest();
                 Rs2Walker.walkTo(2944, 3370, 0, 2);
                 BankHandler.withdrawQuestItems(runeMysteriesAndNatQuiz, true, true);

@@ -74,8 +74,8 @@ public class AccountState {
             if (accumulatedActivityRunTime < mainActivityMaxConsecutiveTime) return;
             // level farming up first to improve wintertodt loots
             else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 27) nextActivity = "baggedPlants";
-            else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 34) nextActivity = "gardenOfDeath";
-            else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 66) nextActivity = "titheFarm";
+            /*else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 34) nextActivity = "gardenOfDeath";
+            else if (Rs2Player.getRealSkillLevel(Skill.FARMING) < 66) nextActivity = "titheFarm";*/
             accumulatedActivityRunTime = 0;
             forceSave = true;
         }

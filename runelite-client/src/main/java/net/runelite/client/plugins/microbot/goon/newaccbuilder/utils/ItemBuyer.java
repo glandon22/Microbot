@@ -65,12 +65,13 @@ public class ItemBuyer {
     }
 
     public static boolean sellItems(List<ItemToSell> items){
+        Microbot.log("Starting item selling handler.");
         boolean res = Rs2GrandExchange.openExchange();
-        System.out.println("open: " + res);
         for (ItemToSell item : items) {
             Microbot.log("Selling " + item.name);
             GrandExchangeRequest request;
             if (item.customPrice != -1) {
+                Microbot.log("Selling " + item.name + " at custom price: " + item.customPrice);
                 request = GrandExchangeRequest.builder()
                         .action(GrandExchangeAction.SELL)
                         .itemName(item.name)
@@ -84,6 +85,7 @@ public class ItemBuyer {
             }
 
             else {
+                Microbot.log("Selling " + item.name + " at custom percent discount: " + item.percentDiscount);
                 request = GrandExchangeRequest.builder()
                         .action(GrandExchangeAction.SELL)
                         .itemName(item.name)
@@ -98,7 +100,7 @@ public class ItemBuyer {
 
             GoonGE.processOffer(request);
         }
-
+        Rs2GrandExchange.closeExchange();
         return true;
     }
 }
