@@ -129,8 +129,8 @@ public class RFDGoblins {
         doUntil(
                 () -> Rs2Inventory.hasItem("orange slices"),
                 () -> {
-                    if (Rs2Widget.hasWidgetText("", 270, 14, false)) {
-                        Rs2Widget.clickWidget(270, 14);
+                    if (Rs2Widget.hasWidgetText("cut the orange", 270, 5, false)) {
+                        Rs2Widget.clickWidget(270, 15);
                     }
                     else {
                         Rs2Inventory.use("knife");

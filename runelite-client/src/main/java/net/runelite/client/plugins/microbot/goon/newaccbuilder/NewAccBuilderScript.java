@@ -248,7 +248,7 @@ public class NewAccBuilderScript extends Script {
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                ItemBuyer.buyItems(necessaryAccountItems);
+                /*ItemBuyer.buyItems(necessaryAccountItems);
                 BankHandler.handlebankTutorial();
                 cooksAssistant.completeQuest();
                 sheepShearer.completeQuest();
@@ -280,7 +280,7 @@ public class NewAccBuilderScript extends Script {
                 BankHandler.withdrawQuestItems(vampAndRomeoJulietItems, true, true);
                 MiscellaneousUtilities.setSpell("earth strike");
                 vampireSlayer.completeQuest();
-                Rs2Walker.walkTo(3212, 3423, 0, 2);
+                Rs2Walker.walkTo(3212, 3423, 0, 2);*/
                 romeoAndJuliet.completeQuest();
                 Rs2Walker.walkTo(3183, 3437, 0);
                 BankHandler.withdrawQuestItems(doricsAndGoblinDiploItems, true, true);
