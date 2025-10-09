@@ -22,8 +22,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.benf.cfr.reader.util.output.BytecodeDumpConsumer.Item;
-
 /**
  * Enhanced requirement registry that manages all types of requirements with automatic
  * uniqueness enforcement, consistency guarantees, and efficient lookup.
@@ -1411,7 +1409,7 @@ public class RequirementRegistry {
      * 
      * @param items List of items competing for the same slot
      * @param slotDescription Description of the slot for the OR requirement name
-     * @param TaskContext The schedule context (must be the same for all items)
+     * @param taskContext The schedule context (must be the same for all items)
      * @return A merged OrRequirement with correct rating and priority
      */
     private OrRequirement createMergedOrRequirement(List<ItemRequirement> items, String slotDescription, TaskContext taskContext) {

@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import java.util.ArrayList;
 import java.util.List;

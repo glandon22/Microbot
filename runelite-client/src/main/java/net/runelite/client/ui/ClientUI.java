@@ -293,7 +293,6 @@ public class ClientUI
 			frame = new ContainableFrame();
 
 			// Try to enable fullscreen on OSX
-			OSXUtil.tryEnableFullscreen(frame);
 
 			frame.setTitle(title);
 			frame.setIconImages(Arrays.asList(ICON_128, ICON_16));
@@ -855,7 +854,6 @@ public class ClientUI
 			case MacOS:
 				// On OSX Component::requestFocus has no visible effect, so we use our OSX-specific
 				// requestUserAttention()
-				OSXUtil.requestUserAttention();
 				break;
 			default:
 				frame.requestFocus();
@@ -872,7 +870,6 @@ public class ClientUI
 		switch (OSType.getOSType())
 		{
 			case MacOS:
-				OSXUtil.requestForeground();
 				frame.setState(Frame.NORMAL);
 				break;
 			case Windows:
@@ -1376,18 +1373,6 @@ public class ClientUI
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				if (OSType.getOSType() == OSType.MacOS && !frame.isFocused())
-				{
-					// On macOS, frame.setVisible(true) only restores focus when the visibility was previously false.
-					// The frame's visibility is not set to false when the window loses focus, so we set it manually.
-					// Additionally, in order to bring the window to the foreground,
-					// frame.setVisible(true) calls CPlatformWindow::nativePushNSWindowToFront.
-					// However, this native method is not called with activateIgnoringOtherApps:YES,
-					// so any other active window will prevent our window from being brought to the front.
-					// To work around this, we use our macOS-specific requestForeground().
-					frame.setVisible(false);
-					OSXUtil.requestForeground();
-				}
 				frame.setVisible(true);
 				frame.setState(Frame.NORMAL); // Restore
 			}

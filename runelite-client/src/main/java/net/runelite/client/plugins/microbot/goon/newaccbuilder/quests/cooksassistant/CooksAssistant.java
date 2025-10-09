@@ -9,7 +9,6 @@ import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import java.util.ArrayList;
 import java.util.List;

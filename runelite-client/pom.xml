@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>net.runelite</groupId>
 		<artifactId>runelite-parent</artifactId>
-		<version>1.11.19-SNAPSHOT</version>
+		<version>1.11.20</version>
 	</parent>
 
 	<artifactId>client</artifactId>
@@ -142,6 +142,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>9.9</version> <!-- Use the latest version -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

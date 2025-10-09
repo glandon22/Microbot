@@ -4,7 +4,6 @@ import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.DialogueHan
 import net.runelite.client.plugins.microbot.goon.newaccbuilder.utils.extras.MiscellaneousUtilities;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import org.benf.cfr.reader.bytecode.analysis.opgraph.op3rewriters.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
