@@ -53,4 +53,26 @@ public class BankHandler {
         }
         Rs2Bank.closeBank();
     }
+    public static void withdrawQuestItems(List<QuestItem> items, boolean dumpInv, boolean dumpEquip, boolean waitAfterDump) {
+        GoonBank.openBank();
+        if (dumpInv) {
+            Rs2Bank.depositAll();
+            if (waitAfterDump) sleepUntil(Rs2Inventory::isEmpty);
+        }
+        if (dumpEquip) {
+            Rs2Bank.depositEquipment();
+            sleep(900);
+        }
+
+        for (QuestItem item : items) {
+            Rs2Bank.setWithdrawAs(item.noted);
+            if (item.withdrawAndEquip) Rs2Bank.withdrawAndEquip(item.name);
+            else if (item.withdrawAll) Rs2Bank.withdrawAll(item.name);
+            else if (item.quantity == 1) Rs2Bank.withdrawOne(item.name);
+            else Rs2Bank.withdrawX(item.name, item.quantity);
+
+            sleep(100);
+        }
+        Rs2Bank.closeBank();
+    }
 }
