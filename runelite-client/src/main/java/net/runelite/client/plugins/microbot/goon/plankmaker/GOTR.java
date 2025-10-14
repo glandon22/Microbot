@@ -106,6 +106,12 @@ public class GOTR {
         return Rs2Player.getLocalPlayer().getWorldLocation().getY() >= 9484;
     }
 
+    private boolean inArena() {
+        WorldPoint playerLoc = Rs2Player.getLocalPlayer().getWorldLocation();
+        return playerLoc.getX() >= 3597 && playerLoc.getX() <= 3633
+                && playerLoc.getY() >= 9482 && playerLoc.getY() <= 9517;
+    }
+
     private boolean gameActive() {
         return !Objects.equals(Rs2Widget.getWidget(746, 5).getText(), "");
     }
@@ -200,7 +206,34 @@ public class GOTR {
         else return null;
     }
 
-    private boolean craftRunes() {
+    private boolean enterAltar() {
+        AltarInformation destinationAltar = determineAltar();
+        if (destinationAltar == null) {
+            Microbot.log("No altar found.", Level.WARN);
+            return false;
+        }
+        Rs2Walker.walkTo(3615, 9500, 0);
+        return doUntil(
+                this::inArena,
+                () -> determineAltar() != destinationAltar,
+                () -> Rs2GameObject.interact(destinationAltar.GOTRPillarID, "enter"),
+                1000,
+                30000
+        );
+    }
+
+    private void craftRunes() {
+
+    }
+
+    private boolean runeCreationHandler() {
+        boolean enteredAltar = enterAltar();
+        if (!enteredAltar) return false;
+
+        return true;
+    }
+
+    private boolean craftRunes1() {
         AltarInformation destinationAltar = determineAltar();
         if (destinationAltar == null) {
             Microbot.log("No altar found.", Level.WARN);
@@ -209,6 +242,7 @@ public class GOTR {
         Rs2Walker.walkTo(3615, 9500, 0);
         boolean enteredAltar = doUntil(
                 () -> Rs2GameObject.exists(destinationAltar.altarID),
+                () -> determineAltar() != destinationAltar,
                 () -> {
                     if (destinationAltar.altarViewTile.getX() != 1) {
                         if (Rs2Walker.canReach(destinationAltar.altarViewTile)) {

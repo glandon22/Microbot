@@ -80,6 +80,23 @@ public class Global {
         return false;
     }
 
+    public static boolean doUntil(BooleanSupplier awaitedCondition, BooleanSupplier failureCondition, Runnable action, int actionInterval, int timeout) {
+        long lastAction = System.currentTimeMillis() - actionInterval * 2L;
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < timeout) {
+            if (awaitedCondition.getAsBoolean()) return true;
+
+            else if (failureCondition.getAsBoolean()) return false;
+
+            else if (System.currentTimeMillis() - lastAction > actionInterval) {
+                action.run();
+                lastAction = System.currentTimeMillis();
+            }
+        }
+
+        return false;
+    }
+
     public static boolean doUntilSuccess(BooleanSupplier awaitedCondition, Runnable action, int actionInterval) {
         long lastAction = System.currentTimeMillis() - actionInterval * 2L;
         while (true) {
