@@ -22,12 +22,12 @@ import org.slf4j.event.Level;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static net.runelite.client.plugins.microbot.util.Global.doUntil;
-import static net.runelite.client.plugins.microbot.util.Global.sleep;
+import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class WT {
     int MIN_WARMTH = 45;
@@ -59,12 +59,6 @@ public class WT {
                 300000
         );
         sleep(10000);
-    }
-
-    private int foodBites() {
-        return Rs2Inventory.itemQuantity(1891) * 3 +
-                Rs2Inventory.itemQuantity(1893) * 2 +
-                Rs2Inventory.itemQuantity(1895);
     }
 
     private boolean inArena() {
@@ -169,14 +163,23 @@ public class WT {
     }
 
     private void collectRewards() {
+        System.out.println("DSfsdfsdfsdsdfsf43523424");
         Rs2Walker.walkTo(1634, 3942, 0);
+        int rewardCount = -1;
+        AtomicInteger itemCount = new AtomicInteger();
         while (
-                parseRewards("You are owed ([\\d,]+) more rewards") == -1
-                        || parseRewards("You are owed ([\\d,]+) more rewards") > 100
+                rewardCount == -1
+                        || rewardCount > 100
         ) {
+            System.out.println("ic = " + itemCount);
+            Microbot.getClientThread().invokeLater(() -> {
+                itemCount.set(Rs2Inventory.inventory().count());
+            });
+            rewardCount = parseRewards("You are owed ([\\d,]+) more rewards");
             if (Rs2Player.getLocalPlayer().getAnimation() == 11758) continue;
-            else if (Rs2Inventory.emptySlotCount() < 2) {
+            else if (itemCount.get() >= 28) {
                 BankHandler.withdrawQuestItems(List.of(), true, false);
+                sleep(300);
             }
             else {
                 Rs2GameObject.interact(new WorldPoint(1636, 3942, 0), "big-search");
@@ -317,6 +320,7 @@ public class WT {
             if (Rs2Inventory.hasItem(pot)) {
                 Rs2Inventory.interact(pot, "drink");
                 sleep(200);
+                return;
             }
         }
 

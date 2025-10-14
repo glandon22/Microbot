@@ -22,7 +22,7 @@ public class PlankMakerScript extends Script {
     public boolean run() {
         AtomicLong start = new AtomicLong(System.currentTimeMillis());
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
-            //gotr.playMinigame();
+            gotr.playMinigame();
             if (!Rs2Inventory.hasItem("coins")) {
                 Microbot.log("Out of coins - exiting", Level.WARN);
                 mainScheduledFuture.cancel(true);

@@ -22,7 +22,20 @@ import static java.util.Map.entry;
 import static net.runelite.client.plugins.microbot.util.Global.*;
 
 public class GOTR {
-
+    String[] craftableRunes = new String[] {
+            "fire rune",
+            "nature rune",
+            "earth rune",
+            "water rune",
+            "cosmic rune",
+            "air rune",
+            "mind rune",
+            "body rune",
+            "chaos rune",
+            "death rune",
+            "law rune",
+            "blood rune"
+    };
     @Value
     private class AltarInformation {
         String name;
@@ -130,7 +143,7 @@ public class GOTR {
 
     private boolean mineFragmentsStart() {
         return doUntil(
-                () -> Rs2Inventory.itemQuantity("guardian fragments") >= 120,
+                () -> !gameActive() || Rs2Inventory.itemQuantity("guardian fragments") >= 120,
                 () -> {
                     if (Rs2Antiban.isMining()) Microbot.log("Mining fragments.");
                     else {
@@ -189,7 +202,6 @@ public class GOTR {
 
     private boolean craftRunes() {
         AltarInformation destinationAltar = determineAltar();
-        System.out.println("sssss " + destinationAltar);
         if (destinationAltar == null) {
             Microbot.log("No altar found.", Level.WARN);
             return false;
@@ -255,12 +267,34 @@ public class GOTR {
     }
 
     private void chargeGuardian() {
+        System.out.println("dfdfg" + Rs2Inventory.itemQuantity("elemental guardian stone"));
+        System.out.println("44444aa" + Rs2Inventory.itemQuantity("catalytic guardian stone"));
         doUntilSuccess(
-                () -> !gameActive() || (!Rs2Inventory.hasItem("elemental guardian stone") && !Rs2Inventory.hasItem("catalytic guardian stone")),
+                () -> /*!gameActive() ||*/ (!Rs2Inventory.hasItem("elemental guardian stone") && !Rs2Inventory.hasItem("catalytic guardian stone")),
                 () -> {
                     Rs2Npc.interact(11403);
                 },
-                2000
+                200
+        );
+    }
+
+    private void placeCell() {
+        doUntilSuccess(
+                () -> !Rs2Inventory.hasItem("overcharged cell", "strong cell", "medium cell", "weak cell"),
+                () -> Rs2GameObject.interact(List.of(43739, 43740, 43741, 43742, 43743)),
+                200
+        );
+    }
+
+    private void depositRunes() {
+
+        doUntilSuccess(
+                () -> !Rs2Inventory.hasItem(craftableRunes, false),
+                () -> {
+                    Rs2Walker.walkTo(3614, 9094, 0);
+                    Rs2GameObject.interact(43696, "deposit-runes");
+                },
+                200
         );
     }
 
@@ -269,7 +303,7 @@ public class GOTR {
             if (!enterGameArena()) continue;
             if (!grabCells()) continue;
             if (!enterLargeFragmentArea()) continue;
-            if (!sleepUntil(this::gameActive, 10000)) continue;
+            if (!sleepUntil(this::gameActive, 60000)) continue;
             Microbot.log("Game has started.");
             if (!mineFragmentsStart()) continue;
             if (!leaveLargeRemains()) continue;
@@ -290,6 +324,10 @@ public class GOTR {
                 Microbot.log("Finished crafting runes");
                 chargeGuardian();
                 Microbot.log("Finished charging guardian");
+                placeCell();
+                Microbot.log("Placed cell.");
+                depositRunes();
+                Microbot.log("Deposited runes - restarting crafting loop.");
             }
 
             //guardian's power: 10%
