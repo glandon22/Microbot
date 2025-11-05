@@ -36,6 +36,67 @@ public class GOTR {
             "law rune",
             "blood rune"
     };
+
+    public Map<String, Integer> getAltarExit(int playerX) {
+        Map<String, Integer> result = new HashMap<>();
+
+        // air
+        if (2835 <= playerX && playerX <= 2851) {
+            result.put("altar", 34760);
+            result.put("exit", 34748);
+        }
+        // water
+        else if (2707 <= playerX && playerX <= 2732) {
+            result.put("altar", 34762);
+            result.put("exit", 34750);
+        }
+        // earth
+        else if (2628 <= playerX && playerX <= 2680) {
+            result.put("altar", 34763);
+            result.put("exit", 34751);
+        }
+        // fire
+        else if (2560 <= playerX && playerX <= 2605) {
+            result.put("altar", 34764);
+            result.put("exit", 34752);
+        }
+        // mind
+        else if (2761 <= playerX && playerX <= 2802) {
+            result.put("altar", 34761);
+            result.put("exit", 34749);
+        }
+        // body
+        else if (2506 <= playerX && playerX <= 2538) {
+            result.put("altar", 34765);
+            result.put("exit", 34753);
+        }
+        // nats
+        else if (2390 <= playerX && playerX <= 2409) {
+            result.put("altar", 34768);
+            result.put("exit", 34756);
+        }
+        // law
+        else if (2444 <= playerX && playerX <= 2484) {
+            result.put("altar", 34767);
+            result.put("exit", 34755);
+        }
+        // death
+        else if (2191 <= playerX && playerX <= 2221) {
+            result.put("altar", 34770);
+            result.put("exit", 34758);
+        }
+        // chaos
+        else if (2244 <= playerX && playerX <= 2298) {
+            result.put("altar", 34769);
+            result.put("exit", 34757);
+        }
+        // cosmic
+        else if (2118 <= playerX && playerX <= 2166) {
+            result.put("altar", 34766);
+            result.put("exit", 34754);
+        }
+        return result;
+    }
     @Value
     private class AltarInformation {
         String name;
@@ -108,8 +169,10 @@ public class GOTR {
 
     private boolean inArena() {
         WorldPoint playerLoc = Rs2Player.getLocalPlayer().getWorldLocation();
-        return playerLoc.getX() >= 3597 && playerLoc.getX() <= 3633
+        boolean result = playerLoc.getX() >= 3597 && playerLoc.getX() <= 3633
                 && playerLoc.getY() >= 9482 && playerLoc.getY() <= 9517;
+        System.out.println("arean res: " + result);
+        return result;
     }
 
     private boolean gameActive() {
@@ -207,6 +270,7 @@ public class GOTR {
     }
 
     private boolean enterAltar() {
+        Microbot.log("Attempting to enter altar");
         AltarInformation destinationAltar = determineAltar();
         if (destinationAltar == null) {
             Microbot.log("No altar found.", Level.WARN);
@@ -214,8 +278,12 @@ public class GOTR {
         }
         Rs2Walker.walkTo(3615, 9500, 0);
         return doUntil(
-                this::inArena,
-                () -> determineAltar() != destinationAltar,
+                () -> !inArena(),
+                () -> {
+                    boolean b = determineAltar() != destinationAltar && inArena();
+                    System.out.println("bb" + b);
+                    return b;
+                },
                 () -> Rs2GameObject.interact(destinationAltar.GOTRPillarID, "enter"),
                 1000,
                 30000
@@ -223,13 +291,39 @@ public class GOTR {
     }
 
     private void craftRunes() {
+        Microbot.log("Crafting runes");
+        doUntilSuccess(
+                () -> !Rs2Inventory.hasItem("guardian essence"),
+                () -> altarInformations.forEach((key, altar) -> {
+                    if (Rs2GameObject.exists(altar.altarID)) {
+                        Rs2GameObject.interact(altar.altarID);
+                        return;
+                    }
+                }),
+                200
+        );
+    }
 
+    private void leaveAltar() {
+        Microbot.log("Attempting to leave altar");
+        doUntilSuccess(
+                this::inArena,
+                () -> altarInformations.forEach((key, altar) -> {
+                    if (Rs2GameObject.exists(altar.altarExitId)) {
+                        Rs2GameObject.interact(altar.altarExitId, "enter");
+                        return;
+                    }
+                }),
+                200
+        );
     }
 
     private boolean runeCreationHandler() {
         boolean enteredAltar = enterAltar();
+        System.out.println("post " + enteredAltar);
         if (!enteredAltar) return false;
-
+        craftRunes();
+        leaveAltar();
         return true;
     }
 
@@ -328,7 +422,7 @@ public class GOTR {
                     Rs2Walker.walkTo(3614, 9094, 0);
                     Rs2GameObject.interact(43696, "deposit-runes");
                 },
-                200
+                1200
         );
     }
 
@@ -354,7 +448,7 @@ public class GOTR {
                 }
 
                 if (!makeEssence()) continue;
-                craftRunes();
+                runeCreationHandler();
                 Microbot.log("Finished crafting runes");
                 chargeGuardian();
                 Microbot.log("Finished charging guardian");
@@ -362,6 +456,9 @@ public class GOTR {
                 Microbot.log("Placed cell.");
                 depositRunes();
                 Microbot.log("Deposited runes - restarting crafting loop.");
+                if (!Rs2Inventory.hasItem("guardian fragments")) {
+                    sleepUntil(() -> !gameActive(), 600000);
+                }
             }
 
             //guardian's power: 10%
